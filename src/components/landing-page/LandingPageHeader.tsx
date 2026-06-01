@@ -2,6 +2,7 @@ import Link from "next/link";
 import AppIcon from "@/components/ui/AppIcon";
 import { PiArrowBendUpRightFill } from "react-icons/pi";
 import { Button } from "@/components/ui/button";
+import ThemeSwitcher from "@/components/ThemeSwitcher";
 
 const LandingPageHeader = () => {
   return (
@@ -24,10 +25,11 @@ const LandingPageHeader = () => {
           >
             How it works
           </a>
+          <ThemeSwitcher />
           <Link href="/build-query">
             <Button className="bg-accent cursor-pointer transitionall duration-300 hover:bg-accent-hover text-white">
               Open builder
-              <PiArrowBendUpRightFill data-icon="inline-end" size={14} />
+              <PiArrowBendUpRightFill size={14} />
             </Button>
           </Link>
         </div>
