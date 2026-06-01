@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Chakra_Petch, Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import ThemeProvider from "@/contexts/ThemeContext";
+import { themeInitScript } from "@/lib/theme";
 
 const chakraPetch = Chakra_Petch({
   variable: "--ff-chakra-petch",
@@ -42,8 +44,12 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${chakraPetch.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+        <ThemeProvider>{children}</ThemeProvider>
+      </body>
     </html>
   );
 }
