@@ -126,3 +126,134 @@
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes qf-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes qf-pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+@keyframes qf-blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.qf-scroll ::-webkit-scrollbar,
+.qf-scroll::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+.qf-scroll ::-webkit-scrollbar-track,
+.qf-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.qf-scroll ::-webkit-scrollbar-thumb,
+.qf-scroll::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 8px;
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+.qf-scroll ::-webkit-scrollbar-thumb:hover,
+.qf-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--text-faint);
+  background-clip: padding-box;
+}
+
+.qf-scroll input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.5);
+  cursor: pointer;
+}
+
+.qf-group {
+  --hue: var(--accent);
+}
+.qf-group[data-depth="1"] {
+  --hue: var(--and);
+}
+.qf-group[data-depth="2"] {
+  --hue: var(--or);
+}
+.qf-group[data-depth="3"] {
+  --hue: var(--depth-3);
+}
+.qf-group[data-depth="4"] {
+  --hue: var(--depth-4);
+}
+.qf-group:not(.is-root)::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  border-radius: 13px 0 0 13px;
+  background: var(--hue);
+  opacity: 0.9;
+}
+.qf-group-body::before {
+  content: "";
+  position: absolute;
+  left: 7px;
+  top: 0;
+  bottom: 26px;
+  width: 1.5px;
+  background: linear-gradient(
+    var(--hue, var(--border-strong)),
+    color-mix(in oklch, var(--hue, var(--border)) 30%, transparent)
+  );
+  opacity: 0.35;
+}
+.qf-child::before {
+  content: "";
+  position: absolute;
+  left: 7px;
+  top: 27px;
+  width: 12px;
+  height: 1.5px;
+  background: var(--hue, var(--border-strong));
+  opacity: 0.35;
+}
+
+.qf-combinator-slider {
+  transition:
+    transform 0.22s cubic-bezier(0.3, 0.9, 0.3, 1),
+    background 0.2s;
+}
+
+.qf-hero-grid {
+  background-image:
+    linear-gradient(var(--bg-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px);
+  background-size: 44px 44px;
+  -webkit-mask-image: radial-gradient(
+    ellipse 80% 60% at 50% 0%,
+    black 40%,
+    transparent 100%
+  );
+  mask-image: radial-gradient(
+    ellipse 80% 60% at 50% 0%,
+    black 40%,
+    transparent 100%
+  );
+}
