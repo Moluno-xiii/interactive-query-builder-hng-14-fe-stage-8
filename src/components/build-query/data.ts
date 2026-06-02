@@ -16,7 +16,6 @@ export const ENUMS: Record<EnumKey, readonly string[]> = {
 export const SCHEMA = {
   name: "orders",
   label: "Orders",
-  rows: "48,219",
   fields: [
     { key: "order_id", label: "order_id", type: "id", icon: "hash" },
     { key: "customer", label: "customer_email", type: "string", icon: "text" },

@@ -1,7 +1,7 @@
 "use client";
 
 import { PiMagnifyingGlass, PiPlay } from "react-icons/pi";
-import { SCHEMA } from "@/components/build-query/data";
+import { DATASET } from "@/components/build-query/data";
 import type { Row } from "@/components/build-query/types";
 import { PAGE_SIZE } from "..";
 import ResultsHeader from "./ResultsHeader";
@@ -45,7 +45,7 @@ const ResultsPanel = ({
             icon={<PiPlay size={22} />}
             iconClassName="bg-accent-dim text-accent"
             title="Ready to run"
-            description={`Press Run or ⌘↵ to execute against ${SCHEMA.rows} rows`}
+            description={`Press Run or ⌘↵ to execute against ${DATASET.length.toLocaleString()} rows`}
           />
         )}
         {state === "loading" && <ResultsSkeleton />}
