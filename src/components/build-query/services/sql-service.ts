@@ -2,11 +2,15 @@ import { OPERATORS } from "../data";
 import type { Group, Rule, Schema, SqlLine } from "../types";
 
 export class SqlService {
+  private quote(v: string): string {
+    return `'${String(v ?? "").replace(/'/g, "''")}'`;
+  }
+
   private sqlValue(field: string, v: string, schema: Schema): string {
     const f = schema.fieldMap[field];
     if (f?.type === "number") return v === "" || v == null ? "∅" : String(v);
-    if (f?.type === "date") return `'${v || "????-??-??"}'`;
-    return `'${String(v ?? "")}'`;
+    if (f?.type === "date") return this.quote(v || "????-??-??");
+    return this.quote(v);
   }
 
   ruleToSQL(rule: Rule, schema: Schema): string {
@@ -30,7 +34,7 @@ export class SqlService {
           : [];
       const list = arr.length
         ? arr
-            .map((v: string) => (f.type === "number" ? v : `'${v}'`))
+            .map((v: string) => (f.type === "number" ? v : this.quote(v)))
             .join(", ")
         : "…";
       return `${col} ${rule.op === "notin" ? "NOT IN" : "IN"} (${list})`;

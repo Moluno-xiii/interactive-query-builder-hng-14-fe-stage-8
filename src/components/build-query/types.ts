@@ -98,7 +98,6 @@ export interface Schema {
   fields: Field[];
   fieldMap: Record<string, Field>;
   rows: Row[];
-  resultCols: string[];
 }
 
 export interface Preset {

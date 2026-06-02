@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   build:
-    name: Lint, typecheck & build
+    name: Lint, typecheck, test & build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -40,6 +40,9 @@ jobs:
 
       - name: Typecheck
         run: pnpm exec tsc --noEmit
+
+      - name: Test
+        run: pnpm exec vitest run
 
       - name: Build
         run: pnpm build

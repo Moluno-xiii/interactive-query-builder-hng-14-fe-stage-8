@@ -19,6 +19,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import type { Group } from "@/components/build-query/types";
+import { parseImport } from "@/components/build-query/query-schema";
 import useQueryState from "@/hooks/useQueryState";
 
 interface IOModalProps {
@@ -34,15 +35,20 @@ const IOModal = ({ tree, onImport, onClose }: IOModalProps) => {
   const [err, setErr] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const doImport = () => {
+    let parsed: unknown;
     try {
-      const p = JSON.parse(text);
-      const t = (p.query || p) as Group;
-      if (!t || t.kind !== "group") throw new Error("bad");
-      onImport(t, typeof p.source === "string" ? p.source : schema.id);
-      onClose();
+      parsed = JSON.parse(text);
     } catch {
-      setErr("Not a valid query JSON object");
+      setErr("That is not valid JSON");
+      return;
     }
+    const result = parseImport(parsed);
+    if (!result) {
+      setErr("This JSON is not a valid query structure");
+      return;
+    }
+    onImport(result.tree, result.source ?? schema.id);
+    onClose();
   };
   return (
     <Dialog

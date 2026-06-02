@@ -16,7 +16,7 @@ interface ResultsTableProps {
 
 const ResultsTable = ({ rows, sort, onSort }: ResultsTableProps) => {
   const { schema } = useQueryState();
-  const cols = schema.resultCols;
+  const cols = schema.fields.map((f) => f.key);
   const idKey = schema.fields[0].key;
   return (
     <table className="w-full border-collapse text-[12.5px]">

@@ -2,6 +2,7 @@
 
 import { createContext, useEffect, useState, type ReactNode } from "react";
 import localStorageStore from "@/lib/local-storage";
+import { storageKeys } from "@/lib/storage-keys";
 import { TOUR_STEPS } from "@/components/build-query/tour-steps";
 
 interface TourContextValue {
@@ -14,7 +15,6 @@ interface TourContextValue {
   prev: () => void;
 }
 
-const TOUR_SEEN_KEY = "qf_tour_seen";
 const TOTAL = TOUR_STEPS.length;
 
 const TourContext = createContext<TourContextValue | null>(null);
@@ -24,7 +24,7 @@ const TourProvider = ({ children }: { children: ReactNode }) => {
   const [step, setStep] = useState(0);
 
   const start = () => {
-    localStorageStore.set(TOUR_SEEN_KEY, true);
+    localStorageStore.set(storageKeys.tour.seen, true);
     setStep(0);
     setActive(true);
   };
@@ -40,9 +40,9 @@ const TourProvider = ({ children }: { children: ReactNode }) => {
   const prev = () => setStep((s) => Math.max(0, s - 1));
 
   useEffect(() => {
-    if (localStorageStore.get<boolean>(TOUR_SEEN_KEY)) return;
+    if (localStorageStore.get<boolean>(storageKeys.tour.seen)) return;
     const id = window.setTimeout(() => {
-      localStorageStore.set(TOUR_SEEN_KEY, true);
+      localStorageStore.set(storageKeys.tour.seen, true);
       setStep(0);
       setActive(true);
     }, 500);

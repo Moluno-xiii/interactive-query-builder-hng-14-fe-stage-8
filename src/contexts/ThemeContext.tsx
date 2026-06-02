@@ -1,7 +1,8 @@
 "use client";
 
 import { createContext, useSyncExternalStore, type ReactNode } from "react";
-import { THEME_STORAGE_KEY, type Theme } from "@/lib/theme";
+import { type Theme } from "@/lib/theme";
+import { storageKeys } from "@/lib/storage-keys";
 
 interface ThemeContextValue {
   theme: Theme;
@@ -29,7 +30,7 @@ const ThemeProvider = ({ children }: { children: ReactNode }) => {
 
   const applyTheme = (next: Theme) => {
     document.documentElement.setAttribute("data-theme", next);
-    localStorage.setItem(THEME_STORAGE_KEY, JSON.stringify(next));
+    localStorage.setItem(storageKeys.theme.mode, JSON.stringify(next));
     listeners.forEach((l) => l());
   };
 

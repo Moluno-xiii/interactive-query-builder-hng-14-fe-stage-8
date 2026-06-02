@@ -56,6 +56,12 @@ const BADGE_TONES: Record<string, Record<string, Tone>> = {
     page_view: TONES.muted,
     error: TONES.danger,
   },
+  severity: {
+    debug: TONES.muted,
+    info: TONES.and,
+    warn: TONES.or,
+    error: TONES.danger,
+  },
 };
 
 const SQL_TOKENIZER =
