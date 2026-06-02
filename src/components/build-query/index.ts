@@ -16,16 +16,6 @@ interface Option {
 
 type ModalKind = "schema" | "io" | "presets" | "history";
 
-const RESULT_COLS = [
-  "order_id",
-  "customer",
-  "category",
-  "product",
-  "amount",
-  "status",
-  "region",
-  "created_at",
-];
 const PAGE_SIZE = 15;
 
 const STATUS_TONE: Record<string, { pill: string; dot: string }> = {
@@ -54,7 +44,6 @@ export {
   panelHead,
   panelTitle,
   STATUS_TONE,
-  RESULT_COLS,
   SQL_TOKENIZER,
   TOKEN_CLASS,
   PAGE_SIZE,

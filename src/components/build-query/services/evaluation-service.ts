@@ -1,5 +1,4 @@
-import { DATASET, FIELD_MAP } from "../data";
-import type { Group, Row, Rule } from "../types";
+import type { Group, Row, Rule, Schema } from "../types";
 import { ValidationService } from "./validation-service";
 
 export class EvaluationService {
@@ -13,8 +12,9 @@ export class EvaluationService {
       .filter(Boolean);
   }
 
-  private evalRule(row: Row, rule: Rule): boolean {
-    const f = FIELD_MAP[rule.field];
+  private evalRule(row: Row, rule: Rule, schema: Schema): boolean {
+    const f = schema.fieldMap[rule.field];
+    if (!f) return false;
     const cell = row[rule.field];
     const op = rule.op;
     if (op === "isnull") return cell == null || cell === "";
@@ -45,8 +45,7 @@ export class EvaluationService {
       if (op === "lt") return c < v;
       if (op === "lte") return c <= v;
       if (op === "between") return c >= v && c <= v2;
-      if (op === "in")
-        return this.splitList(rule.value).map(Number).includes(c);
+      if (op === "in") return this.splitList(rule.value).map(Number).includes(c);
     }
     const s = String(cell).toLowerCase();
     const t = String(rule.value ?? "").toLowerCase();
@@ -73,20 +72,22 @@ export class EvaluationService {
     return false;
   }
 
-  private evalGroup(row: Row, group: Group): boolean {
+  private evalGroup(row: Row, group: Group, schema: Schema): boolean {
     const kids = group.children.filter((c) =>
       c.kind === "group" ? c.children.length : this.validation.isComplete(c),
     );
     if (!kids.length) return true;
     const results = kids.map((c) =>
-      c.kind === "group" ? this.evalGroup(row, c) : this.evalRule(row, c),
+      c.kind === "group"
+        ? this.evalGroup(row, c, schema)
+        : this.evalRule(row, c, schema),
     );
     return group.combinator === "AND"
       ? results.every(Boolean)
       : results.some(Boolean);
   }
 
-  runQuery(root: Group, data: Row[] = DATASET): Row[] {
-    return data.filter((r) => this.evalGroup(r, root));
+  runQuery(root: Group, schema: Schema): Row[] {
+    return schema.rows.filter((r) => this.evalGroup(r, root, schema));
   }
 }

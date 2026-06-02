@@ -18,11 +18,12 @@ import {
 } from "@/components/ui/dialog";
 import BrandMark from "@/components/build-query/ui/BrandMark";
 import ConfirmDialog from "@/components/build-query/panels/ConfirmDialog";
+import { schemaById } from "@/components/build-query/data";
 import type { Group, HistoryEntry } from "@/components/build-query/types";
 
 interface HistoryModalProps {
   history: HistoryEntry[];
-  onLoad: (t: Group) => void;
+  onLoad: (tree: Group, schemaId: string) => void;
   onDelete: (ts: number) => void;
   onClear: () => void;
   onClose: () => void;
@@ -99,7 +100,8 @@ const HistoryModal = ({
                       {h.sql}
                     </code>
                     <div className="mt-px font-jetbrains-mono text-[11px] text-faint">
-                      {h.count.toLocaleString()} rows ·{" "}
+                      {schemaById(h.schemaId).label} · {h.count.toLocaleString()}{" "}
+                      rows ·{" "}
                       {new Date(h.ts).toLocaleTimeString("en-US", {
                         hour: "2-digit",
                         minute: "2-digit",
@@ -112,7 +114,7 @@ const HistoryModal = ({
                       variant="secondary"
                       size="sm"
                       onClick={() => {
-                        onLoad(h.tree);
+                        onLoad(h.tree, h.schemaId);
                         onClose();
                       }}
                     >

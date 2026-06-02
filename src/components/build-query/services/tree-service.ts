@@ -1,4 +1,4 @@
-import { FIELD_MAP, OPS_BY_TYPE, SCHEMA } from "../data";
+import { OPS_BY_TYPE } from "../data";
 import type {
   Action,
   Edge,
@@ -7,6 +7,7 @@ import type {
   Located,
   QueryNode,
   Rule,
+  Schema,
 } from "../types";
 import { ValidationService } from "./validation-service";
 
@@ -29,8 +30,8 @@ export class TreeService {
     return JSON.parse(JSON.stringify(x));
   }
 
-  makeRule(field: string): Rule {
-    const f = FIELD_MAP[field] || SCHEMA.fields[0];
+  makeRule(field: string, schema: Schema): Rule {
+    const f = schema.fieldMap[field] || schema.fields[0];
     return {
       id: this.uid("r"),
       kind: "rule",
@@ -118,15 +119,11 @@ export class TreeService {
     }
     const tl = this.locate(r, targetId);
     if (!tl || !tl.parent) return root;
-    tl.parent.children.splice(
-      tl.index + (edge === "after" ? 1 : 0),
-      0,
-      dl.node,
-    );
+    tl.parent.children.splice(tl.index + (edge === "after" ? 1 : 0), 0, dl.node);
     return r;
   }
 
-  applyAction(tree: Group, a: Action): Group {
+  applyAction(tree: Group, a: Action, schema: Schema): Group {
     const r = this.clone(tree);
     if (a.t === "patch") {
       const l = this.locate(r, a.id);
@@ -136,7 +133,7 @@ export class TreeService {
     if (a.t === "addRule") {
       const l = this.locate(r, a.id);
       if (l && l.node.kind === "group") {
-        l.node.children.push(this.makeRule("amount"));
+        l.node.children.push(this.makeRule(schema.fields[0].key, schema));
         l.node.collapsed = false;
       }
       return r;
@@ -144,7 +141,9 @@ export class TreeService {
     if (a.t === "addGroup") {
       const l = this.locate(r, a.id);
       if (l && l.node.kind === "group") {
-        l.node.children.push(this.makeGroup("OR", [this.makeRule("status")]));
+        l.node.children.push(
+          this.makeGroup("OR", [this.makeRule(schema.fields[0].key, schema)]),
+        );
         l.node.collapsed = false;
       }
       return r;
@@ -169,19 +168,11 @@ export class TreeService {
       });
       return r;
     }
-    if (a.t === "move")
-      return this.moveNode(tree, a.dragId, a.targetId, a.edge);
+    if (a.t === "move") return this.moveNode(tree, a.dragId, a.targetId, a.edge);
     return tree;
   }
 
-  starterTree(): Group {
-    return this.makeGroup("AND", [
-      { ...this.makeRule("status"), op: "in", value: "paid,shipped,delivered" },
-      { ...this.makeRule("amount"), op: "gte", value: "120" },
-      this.makeGroup("OR", [
-        { ...this.makeRule("region"), op: "eq", value: "North America" },
-        { ...this.makeRule("region"), op: "eq", value: "Europe" },
-      ]),
-    ]);
+  starterTree(schema: Schema): Group {
+    return this.makeGroup("AND", [this.makeRule(schema.fields[0].key, schema)]);
   }
 }

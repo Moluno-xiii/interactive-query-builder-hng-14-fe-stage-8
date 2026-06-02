@@ -1,16 +1,17 @@
-import { FIELD_MAP, OPERATORS, SCHEMA } from "../data";
-import type { Group, Rule, SqlLine } from "../types";
+import { OPERATORS } from "../data";
+import type { Group, Rule, Schema, SqlLine } from "../types";
 
 export class SqlService {
-  private sqlValue(field: string, v: string): string {
-    const f = FIELD_MAP[field];
-    if (f.type === "number") return v === "" || v == null ? "∅" : String(v);
-    if (f.type === "date") return `'${v || "????-??-??"}'`;
+  private sqlValue(field: string, v: string, schema: Schema): string {
+    const f = schema.fieldMap[field];
+    if (f?.type === "number") return v === "" || v == null ? "∅" : String(v);
+    if (f?.type === "date") return `'${v || "????-??-??"}'`;
     return `'${String(v ?? "")}'`;
   }
 
-  ruleToSQL(rule: Rule): string {
-    const f = FIELD_MAP[rule.field];
+  ruleToSQL(rule: Rule, schema: Schema): string {
+    const f = schema.fieldMap[rule.field];
+    if (!f) return rule.field;
     const o = OPERATORS[rule.op];
     const col = f.label;
     if (o.arity === 0) {
@@ -38,7 +39,8 @@ export class SqlService {
       return `${col} BETWEEN ${this.sqlValue(
         rule.field,
         rule.value,
-      )} AND ${this.sqlValue(rule.field, rule.value2)}`;
+        schema,
+      )} AND ${this.sqlValue(rule.field, rule.value2, schema)}`;
     }
     const map: Record<string, string> = {
       eq: "=",
@@ -52,17 +54,17 @@ export class SqlService {
       on: "=",
     };
     if (rule.op === "contains")
-      return `${col} LIKE ${this.sqlValue(rule.field, "%" + rule.value + "%")}`;
+      return `${col} LIKE ${this.sqlValue(rule.field, "%" + rule.value + "%", schema)}`;
     if (rule.op === "starts")
-      return `${col} LIKE ${this.sqlValue(rule.field, rule.value + "%")}`;
+      return `${col} LIKE ${this.sqlValue(rule.field, rule.value + "%", schema)}`;
     if (rule.op === "ends")
-      return `${col} LIKE ${this.sqlValue(rule.field, "%" + rule.value)}`;
+      return `${col} LIKE ${this.sqlValue(rule.field, "%" + rule.value, schema)}`;
     if (rule.op === "regex")
-      return `${col} ~ ${this.sqlValue(rule.field, rule.value)}`;
-    return `${col} ${map[rule.op] || o.sym} ${this.sqlValue(rule.field, rule.value)}`;
+      return `${col} ~ ${this.sqlValue(rule.field, rule.value, schema)}`;
+    return `${col} ${map[rule.op] || o.sym} ${this.sqlValue(rule.field, rule.value, schema)}`;
   }
 
-  private groupToSQL(group: Group, depth = 0): SqlLine[] {
+  private groupToSQL(group: Group, schema: Schema, depth = 0): SqlLine[] {
     const lines: SqlLine[] = [];
     const pad = "  ".repeat(depth);
     const kids = group.children;
@@ -75,29 +77,34 @@ export class SqlService {
       const conj = isLast ? "" : group.combinator;
       if (child.kind === "group") {
         lines.push({ pad, text: "(", kind: "paren" });
-        this.groupToSQL(child, depth + 1).forEach((l) => lines.push(l));
+        this.groupToSQL(child, schema, depth + 1).forEach((l) => lines.push(l));
         lines.push({ pad, text: ")", kind: "paren", conj });
       } else {
-        lines.push({ pad, text: this.ruleToSQL(child), kind: "rule", conj });
+        lines.push({
+          pad,
+          text: this.ruleToSQL(child, schema),
+          kind: "rule",
+          conj,
+        });
       }
     });
     return lines;
   }
 
-  fullSQL(root: Group): { select: string; where: SqlLine[] } {
+  fullSQL(root: Group, schema: Schema): { select: string; where: SqlLine[] } {
     return {
-      select: `SELECT * FROM ${SCHEMA.name}`,
-      where: this.groupToSQL(root, 0),
+      select: `SELECT * FROM ${schema.name}`,
+      where: this.groupToSQL(root, schema, 0),
     };
   }
 
-  sqlString(root: Group): string {
+  sqlString(root: Group, schema: Schema): string {
     const walk = (group: Group): string => {
       const parts = group.children.map((c) =>
-        c.kind === "group" ? "(" + walk(c) + ")" : this.ruleToSQL(c),
+        c.kind === "group" ? "(" + walk(c) + ")" : this.ruleToSQL(c, schema),
       );
       return parts.join(" " + group.combinator + " ");
     };
-    return `SELECT * FROM ${SCHEMA.name}\nWHERE ${walk(root) || "TRUE"};`;
+    return `SELECT * FROM ${schema.name}\nWHERE ${walk(root) || "TRUE"};`;
   }
 }

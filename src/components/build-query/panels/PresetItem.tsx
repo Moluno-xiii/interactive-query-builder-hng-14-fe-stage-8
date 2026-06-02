@@ -1,6 +1,7 @@
 import AppButton from "@/components/ui/app-button";
 import { PiBookmark, PiTrash } from "react-icons/pi";
 import BrandMark from "../ui/BrandMark";
+import { schemaById } from "@/components/build-query/data";
 import type { Preset } from "@/components/build-query/types";
 
 const PresetItem = ({
@@ -21,6 +22,7 @@ const PresetItem = ({
       <div className="min-w-0 flex-1">
         <div className="text-[13px] font-semibold">{p.name}</div>
         <div className="mt-px font-jetbrains-mono text-[11px] text-faint">
+          {schemaById(p.schemaId).label} ·{" "}
           {new Date(p.ts).toLocaleString("en-US", {
             month: "short",
             day: "numeric",

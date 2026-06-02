@@ -20,7 +20,7 @@ interface PresetsModalProps {
   presets: Preset[];
   current: Group;
   onSave: (name: string) => void;
-  onLoad: (t: Group) => void;
+  onLoad: (tree: Group, schemaId: string) => void;
   onDelete: (ts: number) => void;
   onClose: () => void;
 }
@@ -107,7 +107,7 @@ const PresetsModal = ({
                 key={p.ts}
                 p={p}
                 onClick={() => {
-                  onLoad(p.tree);
+                  onLoad(p.tree, p.schemaId);
                   onClose();
                 }}
                 onDelete={onDelete}

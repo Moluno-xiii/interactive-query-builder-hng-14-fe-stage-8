@@ -9,14 +9,13 @@ import {
   type ReactNode,
 } from "react";
 import type {
-  Action,
   Group,
   HistoryEntry,
   Preset,
   Row,
 } from "@/components/build-query/types";
 import type { ModalKind } from "@/components/build-query";
-import { FIELD_MAP } from "@/components/build-query/data";
+import { SCHEMAS, schemaById } from "@/components/build-query/data";
 import queryEngine from "@/components/build-query/query-engine";
 import localStorageStore from "@/lib/local-storage";
 import Loading from "@/components/build-query/Loading";
@@ -40,10 +39,15 @@ const QueryBuilderProvider = ({ children }: { children: ReactNode }) => {
     getMountedServer,
   );
 
+  const [activeSchemaId, setActiveSchemaId] = useState<string>(
+    () => schemaById(localStorageStore.get<string>("qf_schema")).id,
+  );
   const [tree, setTree] = useState<Group>(
     () =>
       localStorageStore.get<Group | null>("qf_tree") ||
-      queryEngine.tree.starterTree(),
+      queryEngine.tree.starterTree(
+        schemaById(localStorageStore.get<string>("qf_schema")),
+      ),
   );
   const [modal, setModal] = useState<ModalKind | null>(null);
   const [presets, setPresets] = useState<Preset[]>(
@@ -57,11 +61,20 @@ const QueryBuilderProvider = ({ children }: { children: ReactNode }) => {
   const [sort, setSort] = useState<Sort>({ col: null, dir: "asc" });
   const [page, setPage] = useState(0);
 
+  const schema = schemaById(activeSchemaId);
+
   const treeRef = useRef(tree);
   useEffect(() => {
     treeRef.current = tree;
   }, [tree]);
+  const schemaRef = useRef(schema);
+  useEffect(() => {
+    schemaRef.current = schema;
+  }, [schema]);
 
+  useEffect(() => {
+    if (mounted) localStorageStore.set("qf_schema", activeSchemaId);
+  }, [activeSchemaId, mounted]);
   useEffect(() => {
     if (mounted) localStorageStore.set("qf_tree", tree);
   }, [tree, mounted]);
@@ -72,27 +85,29 @@ const QueryBuilderProvider = ({ children }: { children: ReactNode }) => {
     if (mounted) localStorageStore.set("qf_history", history);
   }, [history, mounted]);
 
-  const dispatch = (a: Action) =>
-    setTree((t) => queryEngine.tree.applyAction(t, a));
+  const dispatch = (a: Parameters<typeof queryEngine.tree.applyAction>[1]) =>
+    setTree((t) => queryEngine.tree.applyAction(t, a, schemaRef.current));
 
   const run = useCallback(() => {
     setRunState("loading");
     setPage(0);
     setTimeout(() => {
       const t = treeRef.current;
-      const rows = queryEngine.evaluation.runQuery(t);
+      const s = schemaRef.current;
+      const rows = queryEngine.evaluation.runQuery(t, s);
       setResults(rows);
       setRunState("done");
-      const sql = queryEngine.sql
-        .sqlString(t)
+      const flat = queryEngine.sql
+        .sqlString(t, s)
         .replace(/\s+/g, " ")
-        .replace("SELECT * FROM orders WHERE ", "")
+        .replace(`SELECT * FROM ${s.name} WHERE `, "")
         .replace(";", "");
       setHistory((h) =>
         [
           {
             ts: Date.now(),
-            sql: sql.length > 92 ? sql.slice(0, 92) + "…" : sql,
+            schemaId: s.id,
+            sql: flat.length > 92 ? flat.slice(0, 92) + "…" : flat,
             count: rows.length,
             tree: queryEngine.tree.clone(t),
           },
@@ -112,23 +127,41 @@ const QueryBuilderProvider = ({ children }: { children: ReactNode }) => {
   const clearBuilder = () => setTree(queryEngine.tree.makeGroup("AND", []));
   const savePreset = (name: string) =>
     setPresets((p) => [
-      queryEngine.presets.buildPreset(name, treeRef.current),
+      queryEngine.presets.buildPreset(name, treeRef.current, schemaRef.current.id),
       ...p,
     ]);
   const deletePreset = (ts: number) =>
     setPresets((p) => p.filter((x) => x.ts !== ts));
-  const importTree = (t: Group) => {
-    queryEngine.tree.reId(t);
-    setTree(t);
-  };
-  const loadTree = (t: Group) => {
-    const c = queryEngine.tree.clone(t);
-    queryEngine.tree.reId(c);
-    setTree(c);
-  };
   const deleteHistory = (ts: number) =>
     setHistory((h) => h.filter((x) => x.ts !== ts));
   const clearHistory = () => setHistory([]);
+
+  const setSchema = (id: string) => {
+    const next = schemaById(id);
+    const starter = queryEngine.tree.starterTree(next);
+    schemaRef.current = next;
+    treeRef.current = starter;
+    setActiveSchemaId(next.id);
+    setTree(starter);
+    setResults([]);
+    setSort({ col: null, dir: "asc" });
+    setPage(0);
+    run();
+  };
+
+  const loadQuery = (loaded: Group, schemaId: string) => {
+    const next = schemaById(schemaId);
+    const c = queryEngine.tree.clone(loaded);
+    queryEngine.tree.reId(c);
+    schemaRef.current = next;
+    treeRef.current = c;
+    setActiveSchemaId(next.id);
+    setTree(c);
+    setResults([]);
+    setSort({ col: null, dir: "asc" });
+    setPage(0);
+    run();
+  };
 
   const ranOnce = useRef(false);
   useEffect(() => {
@@ -153,18 +186,18 @@ const QueryBuilderProvider = ({ children }: { children: ReactNode }) => {
     return () => window.removeEventListener("keydown", handler);
   }, [run]);
 
-  const errors = queryEngine.validation.validate(tree);
+  const errors = queryEngine.validation.validate(tree, schema);
   const errorCount = Object.keys(errors).length;
   const completeCount = queryEngine.tree.countComplete(tree);
 
   const sortedResults = (() => {
     if (!sort.col) return results;
     const col = sort.col;
-    const f = FIELD_MAP[col];
+    const f = schema.fieldMap[col];
     const arr = [...results].sort((a, b) => {
       const x = a[col];
       const y = b[col];
-      if (f.type === "number" || f.type === "date") {
+      if (f && (f.type === "number" || f.type === "date")) {
         return (Number(x) || 0) - (Number(y) || 0);
       }
       return String(x).localeCompare(String(y));
@@ -193,13 +226,15 @@ const QueryBuilderProvider = ({ children }: { children: ReactNode }) => {
     clearBuilder,
     savePreset,
     deletePreset,
-    importTree,
-    loadTree,
     deleteHistory,
     clearHistory,
+    setSchema,
+    loadQuery,
   };
 
   const state: QueryState = {
+    schema,
+    schemas: SCHEMAS,
     tree,
     errors,
     errorCount,

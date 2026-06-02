@@ -13,10 +13,10 @@ export interface QueryActions {
   clearBuilder: () => void;
   savePreset: (name: string) => void;
   deletePreset: (ts: number) => void;
-  importTree: (t: Group) => void;
-  loadTree: (t: Group) => void;
   deleteHistory: (ts: number) => void;
   clearHistory: () => void;
+  setSchema: (id: string) => void;
+  loadQuery: (tree: Group, schemaId: string) => void;
 }
 
 export const QueryActionsContext = createContext<QueryActions | null>(null);

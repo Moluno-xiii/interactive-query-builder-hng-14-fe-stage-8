@@ -1,5 +1,4 @@
-import { FIELD_MAP } from "../data";
-import type { DataValue } from "../types";
+import type { DataValue, Schema } from "../types";
 
 export class FormatService {
   fmtCurrency(v: DataValue): string {
@@ -22,9 +21,10 @@ export class FormatService {
         });
   }
 
-  fmtCell(field: string, v: DataValue): string {
-    const f = FIELD_MAP[field];
+  fmtCell(field: string, v: DataValue, schema: Schema): string {
     if (v == null) return "—";
+    const f = schema.fieldMap[field];
+    if (!f) return String(v);
     if (f.type === "date") return this.fmtDate(v);
     if (f.fmt === "currency") return this.fmtCurrency(v);
     if (f.type === "boolean") return v ? "true" : "false";

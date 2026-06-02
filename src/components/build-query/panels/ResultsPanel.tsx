@@ -1,9 +1,9 @@
 "use client";
 
 import { PiMagnifyingGlass, PiPlay } from "react-icons/pi";
-import { DATASET } from "@/components/build-query/data";
 import type { Row } from "@/components/build-query/types";
 import { PAGE_SIZE } from "..";
+import useQueryState from "@/hooks/useQueryState";
 import ResultsHeader from "./ResultsHeader";
 import ResultsPlaceholder from "./ResultsPlaceholder";
 import ResultsSkeleton from "./ResultsSkeleton";
@@ -27,6 +27,7 @@ const ResultsPanel = ({
   page,
   onPage,
 }: ResultsPanelProps) => {
+  const { schema } = useQueryState();
   const pages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
   const view = rows.slice(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE);
   return (
@@ -45,7 +46,7 @@ const ResultsPanel = ({
             icon={<PiPlay size={22} />}
             iconClassName="bg-accent-dim text-accent"
             title="Ready to run"
-            description={`Press Run or ⌘↵ to execute against ${DATASET.length.toLocaleString()} rows`}
+            description={`Press Run or ⌘↵ to execute against ${schema.rows.length.toLocaleString()} rows`}
           />
         )}
         {state === "loading" && <ResultsSkeleton />}
