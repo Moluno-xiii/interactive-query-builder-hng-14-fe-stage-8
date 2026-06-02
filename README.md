@@ -95,6 +95,18 @@ Splitting them means a component that only triggers actions does not re-subscrib
 
 Every tree edit goes through a reducer-style entry point: `dispatch(action)` calls `queryEngine.tree.applyAction(tree, action, schema)`, which clones the tree, locates the target node, applies the change, and returns a new tree. Updates are immutable, so React sees a fresh reference. Each node carries a unique `id` minted by the tree service and regenerated on duplicate and import, which keeps React keys and drag-and-drop stable. State persists to `localStorage` (keys centralized in `lib/storage-keys.ts`) and is validated with Zod on hydration, so corrupt or stale storage falls back gracefully instead of crashing.
 
+### Query model: nested tree, not a normalized store
+
+The brief calls for a "normalized query tree." This app deliberately uses a nested recursive tree instead: a `Group` holds its children inline (`children: QueryNode[]`), rather than a flat map of nodes keyed by id with parents pointing at children by reference.
+
+The reasons:
+
+- The tree mirrors the UI one to one. `ConditionGroup` recurses over the same shape that SQL generation, evaluation, and validation traverse, so there is a single mental model from data to pixels.
+- Immutable edits stay simple. `applyAction` clones the tree, locates the target, mutates the copy, and returns it; subtree operations (move, duplicate, remove) are plain array splices on the located parent.
+- The usual payoff of normalization, stable addressable identity, is already covered: every node carries a unique `id`, so React keys, drag-and-drop, and lookups stay stable without flattening the structure.
+
+The cost is that `locate` is an O(n) recursive walk rather than an O(1) map lookup, and each edit clones the whole tree. For realistic queries (tens to low hundreds of nodes) that is negligible next to React's render work, and it keeps the code obvious. If a query ever grew to thousands of nodes, an `id`-to-node index could be layered alongside the tree for O(1) access without changing its shape or the components that render it.
+
 ### Query engine
 
 `query-engine.ts` is a small composition root: one `QueryEngine` instance wires six single-responsibility services together with constructor injection, exported as a singleton.
@@ -130,7 +142,16 @@ Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4, Radix UI, and cm
 
 ## Getting started
 
+Clone the repository:
+
 ```bash
+git clone https://github.com/Moluno-xiii/interactive-query-builder-hng-14-fe-stage-8.git
+```
+
+Then install dependencies and start the dev server:
+
+```bash
+cd interactive-query-builder-hng-14-fe-stage-8
 pnpm install
 pnpm dev
 ```
@@ -144,3 +165,7 @@ Open http://localhost:3000, then go to `/build-query`.
 - `pnpm start`: serve the production build.
 - `pnpm lint`: run ESLint.
 - `pnpm test`: run the test suite.
+
+---
+
+Built for the HNG 14 Frontend Stage 8 task.
