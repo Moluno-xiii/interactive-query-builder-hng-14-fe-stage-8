@@ -34,7 +34,7 @@ const GroupHeader = ({
   return (
     <div
       className={cn(
-        "flex items-center gap-1.75 py-2.25 pr-2.5",
+        "flex flex-wrap items-center gap-1.75 py-2.25 pr-2.5",
         isRoot ? "pl-2.75" : "pl-3.25",
       )}
     >
