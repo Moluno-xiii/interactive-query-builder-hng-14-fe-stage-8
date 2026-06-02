@@ -120,7 +120,6 @@ const email = (rnd: () => number) =>
   "@" +
   DOMAINS[Math.floor(rnd() * DOMAINS.length)];
 
-/* ----------------------------- ORDERS ----------------------------------- */
 const ordersFields = [
   { key: "order_id", label: "order_id", type: "id", icon: "hash" },
   { key: "customer", label: "customer_email", type: "string", icon: "text" },
@@ -213,7 +212,6 @@ function buildOrders(n = 260): Row[] {
   return rows;
 }
 
-/* ----------------------------- USERS ------------------------------------ */
 const usersFields = [
   { key: "user_id", label: "user_id", type: "id", icon: "hash" },
   { key: "email", label: "email", type: "string", icon: "text" },
@@ -289,7 +287,6 @@ function buildUsers(n = 180): Row[] {
   return rows;
 }
 
-/* ----------------------------- EVENTS ----------------------------------- */
 const eventsFields = [
   { key: "event_id", label: "event_id", type: "id", icon: "hash" },
   { key: "user", label: "user_email", type: "string", icon: "text" },
@@ -327,7 +324,6 @@ function buildEvents(n = 320): Row[] {
   return rows;
 }
 
-/* ----------------------------- REGISTRY --------------------------------- */
 export const SCHEMAS: Schema[] = [
   {
     id: "orders",
