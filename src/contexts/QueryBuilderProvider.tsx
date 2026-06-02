@@ -18,6 +18,11 @@ import type { ModalKind } from "@/components/build-query";
 import { SCHEMAS, schemaById } from "@/components/build-query/data";
 import queryEngine from "@/components/build-query/query-engine";
 import localStorageStore from "@/lib/local-storage";
+import {
+  parseTree,
+  parsePresets,
+  parseHistory,
+} from "@/components/build-query/query-schema";
 import Loading from "@/components/build-query/Loading";
 import QueryStateProvider, {
   type QueryState,
@@ -44,17 +49,17 @@ const QueryBuilderProvider = ({ children }: { children: ReactNode }) => {
   );
   const [tree, setTree] = useState<Group>(
     () =>
-      localStorageStore.get<Group | null>("qf_tree") ||
+      parseTree(localStorageStore.get("qf_tree")) ??
       queryEngine.tree.starterTree(
         schemaById(localStorageStore.get<string>("qf_schema")),
       ),
   );
   const [modal, setModal] = useState<ModalKind | null>(null);
-  const [presets, setPresets] = useState<Preset[]>(
-    () => localStorageStore.get<Preset[]>("qf_presets") ?? [],
+  const [presets, setPresets] = useState<Preset[]>(() =>
+    parsePresets(localStorageStore.get("qf_presets")),
   );
-  const [history, setHistory] = useState<HistoryEntry[]>(
-    () => localStorageStore.get<HistoryEntry[]>("qf_history") ?? [],
+  const [history, setHistory] = useState<HistoryEntry[]>(() =>
+    parseHistory(localStorageStore.get("qf_history")),
   );
   const [runState, setRunState] = useState<RunState>("idle");
   const [results, setResults] = useState<Row[]>([]);
