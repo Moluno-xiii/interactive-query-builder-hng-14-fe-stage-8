@@ -4,6 +4,7 @@ import SchemaModal from "@/components/build-query/panels/SchemaModal";
 import IOModal from "@/components/build-query/panels/IOModal";
 import PresetsModal from "@/components/build-query/panels/PresetsModal";
 import HistoryModal from "@/components/build-query/panels/HistoryModal";
+import ShortcutsModal from "@/components/build-query/panels/ShortcutsModal";
 import useQueryActions from "@/hooks/useQueryActions";
 import useQueryState from "@/hooks/useQueryState";
 
@@ -46,6 +47,7 @@ const QueryModals = () => {
           onClose={onClose}
         />
       )}
+      {modal === "shortcuts" && <ShortcutsModal onClose={onClose} />}
     </>
   );
 };

@@ -14,7 +14,7 @@ interface Option {
   icon?: string;
 }
 
-type ModalKind = "schema" | "io" | "presets" | "history";
+type ModalKind = "schema" | "io" | "presets" | "history" | "shortcuts";
 
 const PAGE_SIZE = 15;
 

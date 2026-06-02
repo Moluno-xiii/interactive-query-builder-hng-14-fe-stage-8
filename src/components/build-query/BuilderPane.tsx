@@ -16,7 +16,7 @@ import useQueryState from "@/hooks/useQueryState";
 const BuilderPane = () => {
   const { tree, errors, errorCount, completeCount, allCollapsed } =
     useQueryState();
-  const { dispatch, clearBuilder } = useQueryActions();
+  const { dispatch, clearBuilder, setModal } = useQueryActions();
   return (
     <section className="flex min-w-0 flex-[1.32] flex-col bg-background max-[940px]:min-h-[56vh]">
       <header
@@ -83,7 +83,17 @@ const BuilderPane = () => {
           <kbd className="rounded border border-border bg-surface-2 px-1.25 py-px font-jetbrains-mono text-muted-foreground">
             ⌘↵
           </kbd>{" "}
-          to run · nest groups for AND/OR logic
+          to run · nest groups for AND/OR logic ·{" "}
+          <button
+            type="button"
+            onClick={() => setModal("shortcuts")}
+            className="text-faint transition hover:text-muted-foreground"
+          >
+            <kbd className="rounded border border-border bg-surface-2 px-1.25 py-px font-jetbrains-mono text-muted-foreground">
+              ?
+            </kbd>{" "}
+            shortcuts
+          </button>
         </div>
       </div>
     </section>
