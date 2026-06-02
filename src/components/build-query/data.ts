@@ -332,16 +332,6 @@ export const SCHEMAS: Schema[] = [
     fields: ordersFields,
     fieldMap: fieldMapOf(ordersFields),
     rows: buildOrders(),
-    resultCols: [
-      "order_id",
-      "customer",
-      "category",
-      "product",
-      "amount",
-      "status",
-      "region",
-      "created_at",
-    ],
   },
   {
     id: "users",
@@ -350,16 +340,6 @@ export const SCHEMAS: Schema[] = [
     fields: usersFields,
     fieldMap: fieldMapOf(usersFields),
     rows: buildUsers(),
-    resultCols: [
-      "user_id",
-      "email",
-      "name",
-      "plan",
-      "role",
-      "account_status",
-      "mrr",
-      "signed_up_at",
-    ],
   },
   {
     id: "events",
@@ -368,15 +348,6 @@ export const SCHEMAS: Schema[] = [
     fields: eventsFields,
     fieldMap: fieldMapOf(eventsFields),
     rows: buildEvents(),
-    resultCols: [
-      "event_id",
-      "user",
-      "event_type",
-      "platform",
-      "severity",
-      "duration_ms",
-      "occurred_at",
-    ],
   },
 ];
 

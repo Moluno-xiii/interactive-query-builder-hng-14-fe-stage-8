@@ -4,7 +4,7 @@ import useQueryState from "@/hooks/useQueryState";
 
 const ResultsSkeleton = () => {
   const { schema } = useQueryState();
-  const cols = schema.resultCols;
+  const cols = schema.fields.map((f) => f.key);
   return (
     <table className="w-full border-collapse text-[12.5px]">
       <thead>
