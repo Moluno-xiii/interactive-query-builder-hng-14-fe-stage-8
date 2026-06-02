@@ -257,3 +257,30 @@
     transparent 100%
   );
 }
+
+.qf-hero-glow {
+  background-image:
+    linear-gradient(var(--accent) 1px, transparent 1px),
+    linear-gradient(90deg, var(--accent) 1px, transparent 1px),
+    radial-gradient(
+      circle 200px at var(--mx, -300px) var(--my, -300px),
+      color-mix(in oklch, var(--accent) 13%, transparent),
+      transparent 70%
+    );
+  background-size:
+    44px 44px,
+    44px 44px,
+    100% 100%;
+  opacity: var(--glow-op, 0);
+  transition: opacity 0.35s ease;
+  -webkit-mask-image: radial-gradient(
+    circle 170px at var(--mx, -300px) var(--my, -300px),
+    #000,
+    transparent 75%
+  );
+  mask-image: radial-gradient(
+    circle 170px at var(--mx, -300px) var(--my, -300px),
+    #000,
+    transparent 75%
+  );
+}
