@@ -3,6 +3,7 @@
 import { PiArrowDown, PiArrowUp } from "react-icons/pi";
 import { cn } from "@/lib/utils";
 import StatusPill from "./StatusPill";
+import { BADGE_TONES } from "@/components/build-query";
 import type { Row } from "@/components/build-query/types";
 import queryEngine from "@/components/build-query/query-engine";
 import useQueryState from "@/hooks/useQueryState";
@@ -60,8 +61,8 @@ const ResultsTable = ({ rows, sort, onSort }: ResultsTableProps) => {
                     "font-jetbrains-mono text-[11.5px] text-muted-foreground",
                 )}
               >
-                {c === "status" ? (
-                  <StatusPill value={r[c]} />
+                {BADGE_TONES[c] ? (
+                  <StatusPill value={r[c]} col={c} />
                 ) : (
                   queryEngine.format.fmtCell(c, r[c], schema)
                 )}

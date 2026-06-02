@@ -18,13 +18,44 @@ type ModalKind = "schema" | "io" | "presets" | "history";
 
 const PAGE_SIZE = 15;
 
-const STATUS_TONE: Record<string, { pill: string; dot: string }> = {
-  paid: { pill: "bg-accent-dim text-accent", dot: "bg-accent" },
-  delivered: { pill: "bg-accent-dim text-accent", dot: "bg-accent" },
-  shipped: { pill: "bg-and-dim text-and", dot: "bg-and" },
-  pending: { pill: "bg-or-dim text-or", dot: "bg-or" },
-  refunded: { pill: "bg-danger-dim text-danger", dot: "bg-danger" },
-  cancelled: { pill: "bg-surface-2 text-faint", dot: "bg-faint" },
+interface Tone {
+  pill: string;
+  dot: string;
+}
+
+const TONES: Record<string, Tone> = {
+  accent: { pill: "bg-accent-dim text-accent", dot: "bg-accent" },
+  and: { pill: "bg-and-dim text-and", dot: "bg-and" },
+  or: { pill: "bg-or-dim text-or", dot: "bg-or" },
+  danger: { pill: "bg-danger-dim text-danger", dot: "bg-danger" },
+  muted: { pill: "bg-surface-2 text-faint", dot: "bg-faint" },
+};
+
+const MUTED_TONE = TONES.muted;
+
+const BADGE_TONES: Record<string, Record<string, Tone>> = {
+  status: {
+    paid: TONES.accent,
+    delivered: TONES.accent,
+    shipped: TONES.and,
+    pending: TONES.or,
+    refunded: TONES.danger,
+    cancelled: TONES.muted,
+  },
+  account_status: {
+    active: TONES.accent,
+    invited: TONES.and,
+    suspended: TONES.or,
+    churned: TONES.danger,
+  },
+  event_type: {
+    signup: TONES.accent,
+    purchase: TONES.or,
+    click: TONES.and,
+    login: TONES.and,
+    page_view: TONES.muted,
+    error: TONES.danger,
+  },
 };
 
 const SQL_TOKENIZER =
@@ -38,12 +69,13 @@ const TOKEN_CLASS = {
   op: "text-muted-foreground",
 } as const;
 
-export type { Option, ModalKind };
+export type { Option, ModalKind, Tone };
 export {
   inputBase,
   panelHead,
   panelTitle,
-  STATUS_TONE,
+  BADGE_TONES,
+  MUTED_TONE,
   SQL_TOKENIZER,
   TOKEN_CLASS,
   PAGE_SIZE,
