@@ -129,3 +129,23 @@ describe("SqlService.fullSQL", () => {
     expect(sql.fullSQL(group([]), orders).where[0].kind).toBe("comment");
   });
 });
+
+describe("SqlService value escaping", () => {
+  it("escapes single quotes in string values", () => {
+    expect(
+      sql.ruleToSQL(rule({ field: "customer", op: "eq", value: "O'Brien" }), orders),
+    ).toBe("customer_email = 'O''Brien'");
+  });
+
+  it("escapes single quotes inside IN lists", () => {
+    expect(
+      sql.ruleToSQL(rule({ field: "region", op: "in", value: "O'Hare,APAC" }), orders),
+    ).toBe("region IN ('O''Hare', 'APAC')");
+  });
+
+  it("escapes single quotes within LIKE patterns", () => {
+    expect(
+      sql.ruleToSQL(rule({ field: "customer", op: "contains", value: "d'arc" }), orders),
+    ).toBe("customer_email LIKE '%d''arc%'");
+  });
+});
