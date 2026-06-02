@@ -15,6 +15,8 @@ interface QueryModalsProps {
   onSavePreset: (name: string) => void;
   onLoadTree: (t: Group) => void;
   onDeletePreset: (ts: number) => void;
+  onDeleteHistory: (ts: number) => void;
+  onClearHistory: () => void;
 }
 
 const QueryModals = ({
@@ -27,6 +29,8 @@ const QueryModals = ({
   onSavePreset,
   onLoadTree,
   onDeletePreset,
+  onDeleteHistory,
+  onClearHistory,
 }: QueryModalsProps) => {
   if (!modal) return null;
 
@@ -47,7 +51,13 @@ const QueryModals = ({
         />
       )}
       {modal === "history" && (
-        <HistoryModal history={history} onLoad={onLoadTree} onClose={onClose} />
+        <HistoryModal
+          history={history}
+          onLoad={onLoadTree}
+          onDelete={onDeleteHistory}
+          onClear={onClearHistory}
+          onClose={onClose}
+        />
       )}
     </>
   );
