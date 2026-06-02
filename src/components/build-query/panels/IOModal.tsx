@@ -18,17 +18,18 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { SCHEMA } from "@/components/build-query/data";
 import type { Group } from "@/components/build-query/types";
+import useQueryState from "@/hooks/useQueryState";
 
 interface IOModalProps {
   tree: Group;
-  onImport: (t: Group) => void;
+  onImport: (tree: Group, schemaId: string) => void;
   onClose: () => void;
 }
 
 const IOModal = ({ tree, onImport, onClose }: IOModalProps) => {
-  const json = JSON.stringify({ source: SCHEMA.name, query: tree }, null, 2);
+  const { schema } = useQueryState();
+  const json = JSON.stringify({ source: schema.id, query: tree }, null, 2);
   const [text, setText] = useState(json);
   const [err, setErr] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -36,8 +37,8 @@ const IOModal = ({ tree, onImport, onClose }: IOModalProps) => {
     try {
       const p = JSON.parse(text);
       const t = (p.query || p) as Group;
-      if (!t.kind) throw new Error("bad");
-      onImport(t);
+      if (!t || t.kind !== "group") throw new Error("bad");
+      onImport(t, typeof p.source === "string" ? p.source : schema.id);
       onClose();
     } catch {
       setErr("Not a valid query JSON object");
@@ -64,7 +65,7 @@ const IOModal = ({ tree, onImport, onClose }: IOModalProps) => {
                 Import / Export
               </DialogTitle>
               <DialogDescription className="mt-px text-[12.5px] text-faint">
-                Move query definitions as JSON
+                Move query definitions as JSON — importing switches to its table
               </DialogDescription>
             </div>
           </div>

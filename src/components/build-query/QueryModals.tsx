@@ -11,12 +11,11 @@ const QueryModals = () => {
   const { modal, tree, presets, history } = useQueryState();
   const {
     setModal,
-    importTree,
     savePreset,
-    loadTree,
     deletePreset,
     deleteHistory,
     clearHistory,
+    loadQuery,
   } = useQueryActions();
 
   if (!modal) return null;
@@ -26,14 +25,14 @@ const QueryModals = () => {
     <>
       {modal === "schema" && <SchemaModal onClose={onClose} />}
       {modal === "io" && (
-        <IOModal tree={tree} onImport={importTree} onClose={onClose} />
+        <IOModal tree={tree} onImport={loadQuery} onClose={onClose} />
       )}
       {modal === "presets" && (
         <PresetsModal
           presets={presets}
           current={tree}
           onSave={savePreset}
-          onLoad={loadTree}
+          onLoad={loadQuery}
           onDelete={deletePreset}
           onClose={onClose}
         />
@@ -41,7 +40,7 @@ const QueryModals = () => {
       {modal === "history" && (
         <HistoryModal
           history={history}
-          onLoad={loadTree}
+          onLoad={loadQuery}
           onDelete={deleteHistory}
           onClear={clearHistory}
           onClose={onClose}

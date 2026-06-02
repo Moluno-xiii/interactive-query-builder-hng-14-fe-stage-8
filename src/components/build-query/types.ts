@@ -6,7 +6,20 @@ export type FieldType =
   | "date"
   | "boolean";
 
-export type EnumKey = "status" | "region" | "category" | "payment" | "channel";
+export type EnumKey =
+  | "status"
+  | "region"
+  | "category"
+  | "payment"
+  | "channel"
+  | "plan"
+  | "role"
+  | "account_status"
+  | "country"
+  | "event_type"
+  | "platform"
+  | "severity"
+  | "env";
 
 export interface Field {
   key: string;
@@ -50,6 +63,7 @@ export type ValidationLevel = "error" | "warn";
 export type Errors = Record<string, { level: ValidationLevel; msg: string }>;
 
 export type Edge = "before" | "after" | "inside";
+
 export type NodePatch = Partial<
   Pick<Rule, "field" | "op" | "value" | "value2">
 > &
@@ -77,14 +91,26 @@ export interface SqlLine {
   conj?: string;
 }
 
+export interface Schema {
+  id: string;
+  name: string;
+  label: string;
+  fields: Field[];
+  fieldMap: Record<string, Field>;
+  rows: Row[];
+  resultCols: string[];
+}
+
 export interface Preset {
   name: string;
   ts: number;
+  schemaId: string;
   tree: Group;
 }
 
 export interface HistoryEntry {
   ts: number;
+  schemaId: string;
   sql: string;
   count: number;
   tree: Group;

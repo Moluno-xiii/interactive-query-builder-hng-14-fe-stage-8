@@ -4,9 +4,9 @@ import { useState } from "react";
 import { PiCheck, PiCode, PiCopy, PiWarningCircle } from "react-icons/pi";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { SCHEMA } from "@/components/build-query/data";
 import type { Group } from "@/components/build-query/types";
 import queryEngine from "@/components/build-query/query-engine";
+import useQueryState from "@/hooks/useQueryState";
 import { panelHead, panelTitle } from "..";
 import highlightSql from "./highlightSql";
 
@@ -16,11 +16,12 @@ interface PreviewPanelProps {
 }
 
 const PreviewPanel = ({ tree, errorCount }: PreviewPanelProps) => {
-  const { where } = queryEngine.sql.fullSQL(tree);
+  const { schema } = useQueryState();
+  const { where } = queryEngine.sql.fullSQL(tree, schema);
   const [copied, setCopied] = useState(false);
   const copy = () => {
     if (navigator.clipboard)
-      navigator.clipboard.writeText(queryEngine.sql.sqlString(tree));
+      navigator.clipboard.writeText(queryEngine.sql.sqlString(tree, schema));
     setCopied(true);
     setTimeout(() => setCopied(false), 1400);
   };
@@ -69,7 +70,7 @@ const PreviewPanel = ({ tree, errorCount }: PreviewPanelProps) => {
             <span className="font-semibold text-and">SELECT</span>{" "}
             <span className="text-muted-foreground">*</span>{" "}
             <span className="font-semibold text-and">FROM</span>{" "}
-            <span className="font-semibold text-accent">{SCHEMA.name}</span>
+            <span className="font-semibold text-accent">{schema.name}</span>
           </div>
           <div className="whitespace-pre">
             <span className="font-semibold text-and">WHERE</span>

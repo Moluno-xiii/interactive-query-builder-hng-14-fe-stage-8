@@ -13,16 +13,12 @@ import Combobox from "@/components/ui/combobox";
 import FieldIcon from "@/components/build-query/ui/FieldIcon";
 import ValueControl from "@/components/build-query/builder/ValueControl";
 import DropLine from "@/components/build-query/builder/DropLine";
-import {
-  FIELD_MAP,
-  OPERATORS,
-  OPS_BY_TYPE,
-  SCHEMA,
-} from "@/components/build-query/data";
+import { OPERATORS, OPS_BY_TYPE } from "@/components/build-query/data";
 import type { Errors, NodePatch, Rule } from "@/components/build-query/types";
 import queryEngine from "@/components/build-query/query-engine";
 import { type Option } from "..";
 import useDropItem from "@/hooks/useDropItem";
+import useQueryState from "@/hooks/useQueryState";
 
 interface RuleRowProps {
   rule: Rule;
@@ -39,14 +35,15 @@ const RuleRow = ({
   onRemove,
   onDuplicate,
 }: RuleRowProps) => {
+  const { schema } = useQueryState();
   const rowRef = useRef<HTMLDivElement>(null);
-  const field = FIELD_MAP[rule.field];
+  const field = schema.fieldMap[rule.field] ?? schema.fields[0];
   const err = errors[rule.id];
   const { onDragOver, onDrop, hintEdge, isDragging, dnd } = useDropItem(
     rule.id,
   );
 
-  const fieldOpts: Option[] = SCHEMA.fields.map((f) => ({
+  const fieldOpts: Option[] = schema.fields.map((f) => ({
     value: f.key,
     label: f.label,
     sub: f.type,
@@ -59,7 +56,7 @@ const RuleRow = ({
   }));
 
   const changeField = (key: string) => {
-    const nf = FIELD_MAP[key];
+    const nf = schema.fieldMap[key];
     const keepOp = OPS_BY_TYPE[nf.type].includes(rule.op)
       ? rule.op
       : queryEngine.tree.defaultOperator(nf.type);
@@ -112,7 +109,7 @@ const RuleRow = ({
           renderValue={(o) => (
             <span className="flex min-w-0 items-center gap-1.5">
               <FieldIcon
-                name={FIELD_MAP[o.value].icon}
+                name={schema.fieldMap[o.value]?.icon ?? ""}
                 size={13}
                 className="shrink-0 text-faint"
               />

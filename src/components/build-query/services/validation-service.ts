@@ -1,5 +1,5 @@
-import { FIELD_MAP, OPERATORS, OPS_BY_TYPE } from "../data";
-import type { Errors, Group, QueryNode, Rule } from "../types";
+import { OPERATORS, OPS_BY_TYPE } from "../data";
+import type { Errors, Group, QueryNode, Rule, Schema } from "../types";
 
 export class ValidationService {
   isComplete(rule: Rule): boolean {
@@ -11,7 +11,7 @@ export class ValidationService {
     return String(rule.value ?? "").length > 0;
   }
 
-  validate(root: Group): Errors {
+  validate(root: Group, schema: Schema): Errors {
     const errs: Errors = {};
     const walk = (node: QueryNode) => {
       if (node.kind === "group") {
@@ -23,7 +23,14 @@ export class ValidationService {
         node.children.forEach(walk);
         return;
       }
-      const f = FIELD_MAP[node.field];
+      const f = schema.fieldMap[node.field];
+      if (!f) {
+        errs[node.id] = {
+          level: "error",
+          msg: `Unknown field "${node.field}" for ${schema.label}`,
+        };
+        return;
+      }
       const o = OPERATORS[node.op];
       if (!OPS_BY_TYPE[f.type].includes(node.op)) {
         errs[node.id] = {
