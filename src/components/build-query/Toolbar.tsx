@@ -7,6 +7,7 @@ import {
   PiClockCounterClockwiseThin,
   PiCodeLight,
   PiDatabase,
+  PiKeyboard,
   PiList,
   PiQuestion,
 } from "react-icons/pi";
@@ -75,6 +76,15 @@ const Toolbar = () => {
             title="Import / export JSON"
           >
             <PiCodeLight size={18} />
+          </AppButton>
+          <AppButton
+            onClick={() => setModal("shortcuts")}
+            variant={"ghost"}
+            size={"icon"}
+            aria-label="Keyboard shortcuts"
+            title="Keyboard shortcuts"
+          >
+            <PiKeyboard size={18} />
           </AppButton>
         </div>
         <AppButton

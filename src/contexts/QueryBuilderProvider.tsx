@@ -187,6 +187,18 @@ const QueryBuilderProvider = ({ children }: { children: ReactNode }) => {
         e.preventDefault();
         setModal("presets");
       }
+      if (e.key === "?") {
+        const el = e.target as HTMLElement | null;
+        const typing =
+          !!el &&
+          (el.tagName === "INPUT" ||
+            el.tagName === "TEXTAREA" ||
+            el.isContentEditable);
+        if (!typing) {
+          e.preventDefault();
+          setModal("shortcuts");
+        }
+      }
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
