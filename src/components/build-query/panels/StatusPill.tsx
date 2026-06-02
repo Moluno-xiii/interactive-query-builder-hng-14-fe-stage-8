@@ -1,8 +1,9 @@
 import { cn } from "@/lib/utils";
 import type { DataValue } from "@/components/build-query/types";
-import { STATUS_TONE } from "..";
-const StatusPill = ({ value }: { value: DataValue }) => {
-  const tone = STATUS_TONE[String(value)] || STATUS_TONE.cancelled;
+import { BADGE_TONES, MUTED_TONE } from "..";
+
+const StatusPill = ({ value, col }: { value: DataValue; col: string }) => {
+  const tone = BADGE_TONES[col]?.[String(value)] ?? MUTED_TONE;
   return (
     <span
       className={cn(
