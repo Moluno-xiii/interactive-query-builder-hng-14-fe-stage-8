@@ -51,6 +51,79 @@ A visual query builder built with Next.js. Compose complex, nested database quer
 - `Cmd/Ctrl + S`: open the presets panel to save the current query.
 - `Esc`: close the open modal or the mobile sidebar.
 
+## Architecture
+
+### Layers
+
+The code is organized by feature, with a hard split between UI, state, and pure logic.
+
+```
+src/
+  app/                     Next App Router entry points (landing, /build-query, layout)
+  components/
+    landing-page/          marketing sections
+    build-query/           the query builder feature
+      builder/             recursive builder UI (groups, rules, value controls, drag and drop)
+      panels/              preview, results, and modals (schema, import/export, presets, history)
+      services/            pure, framework-free logic (one class per concern)
+      query-engine.ts      composes the services into a single injected instance
+      data.ts              schemas and seeded mock datasets
+      types.ts             typed query models
+      query-schema.ts      Zod validation for untrusted input
+    ui/                    shared primitives (button, combobox, badge, icons)
+  contexts/                React providers (query state/actions, theme, tour)
+  hooks/                   thin context consumers and interaction hooks
+  lib/                     storage, storage keys, theme, utilities
+```
+
+The query model lives in `types.ts`: a `QueryNode` is a discriminated union of `Rule` and `Group`, and a `Group` holds an array of child `QueryNode`s. That one recursive type drives rendering, SQL generation, evaluation, and validation.
+
+### Recursive rendering strategy
+
+The builder is a single recursive component, `ConditionGroup`. It renders a group's header, then maps its children: a `group` child renders another `<ConditionGroup>` with `depth + 1`, and a `rule` child renders a `<RuleRow>`. Nesting has no fixed limit; it is bounded only by the data. Depth is passed down purely for styling (the colored rails and combinator hue key off `data-depth`, capped at 4 so the palette cycles).
+
+The recursion is mirrored on the logic side: `tree-service` walks and locates nodes recursively, `sql-service` builds nested parenthesized clauses recursively, and `evaluation-service` evaluates a group by recursively combining its children under AND/OR. The same shape is traversed the same way everywhere.
+
+### State management
+
+A single provider, `QueryBuilderProvider`, owns all builder state (tree, active schema, presets, history, run state, results, sort, page, open modal) and exposes it through two separate contexts:
+
+- `QueryStateContext` for reads
+- `QueryActionsContext` for actions (`dispatch`, `run`, `setModal`, ...)
+
+Splitting them means a component that only triggers actions does not re-subscribe to state, and the read/write surfaces stay small and explicit. Components reach them via `useQueryState` and `useQueryActions`.
+
+Every tree edit goes through a reducer-style entry point: `dispatch(action)` calls `queryEngine.tree.applyAction(tree, action, schema)`, which clones the tree, locates the target node, applies the change, and returns a new tree. Updates are immutable, so React sees a fresh reference. Each node carries a unique `id` minted by the tree service and regenerated on duplicate and import, which keeps React keys and drag-and-drop stable. State persists to `localStorage` (keys centralized in `lib/storage-keys.ts`) and is validated with Zod on hydration, so corrupt or stale storage falls back gracefully instead of crashing.
+
+### Query engine
+
+`query-engine.ts` is a small composition root: one `QueryEngine` instance wires six single-responsibility services together with constructor injection, exported as a singleton.
+
+- `TreeService`: immutable tree operations (add, remove, duplicate, move, collapse, patch), recursive locate and walk, id minting, and a drag-and-drop move with an ancestor guard that refuses to drop a group into its own descendant.
+- `SqlService`: turns a tree into both a flat SQL string and structured, highlightable lines; string values are quote-escaped to keep generated SQL safe.
+- `EvaluationService`: compiles a tree into a predicate and filters the dataset (the simulated execution).
+- `ValidationService`: semantic validation (operator/field compatibility, range and date order, regex compile, empty groups) producing a node-keyed error map.
+- `FormatService`: cell and value formatting for the results grid.
+- `PresetService`: preset serialization.
+
+Each service is a plain class with no React or DOM dependency, which is why they are unit-tested directly. `query-schema.ts` (Zod) sits in front of the untrusted boundaries (imported JSON and persisted state) and does structural validation only, keeping it separate from the semantic rules in `ValidationService`.
+
+### Performance
+
+- The React Compiler is enabled (`reactCompiler: true`), so components and derived values are auto-memoized without hand-written `useMemo`/`useCallback`.
+- Read and write contexts are split to keep re-render scope tight.
+- Derived data (error map, completed-filter count, collapse state, sorted results) is computed from the tree on render rather than stored, keeping one source of truth and avoiding sync bugs.
+- Every node uses its stable `id` as its React key, so reordering and nesting reconcile cleanly.
+- `useSyncExternalStore` gates the first client render to avoid hydration mismatch with `localStorage`-backed state.
+
+### Trade-offs
+
+- Custom drag-and-drop over a library: native HTML5 DnD with a custom drop-line keeps dependencies down and gives full control over the nesting UX, at the cost of more manual edge handling.
+- SQL-only preview: the spec allows SQL or Mongo or GraphQL, so the preview targets one format well rather than three partially.
+- Context plus a reducer-style service instead of Redux or Zustand: no extra state library for a single-feature surface, and the React Compiler covers memoization.
+- Seeded in-memory data: execution runs against deterministically generated rows (a seeded PRNG) instead of a backend, so the app stays front-end-only and reproducible across reloads.
+- Zod only at the edges: structural validation guards imports and storage, while semantic validation stays in `ValidationService`, keeping the two concerns separate.
+
 ## Tech stack
 
 Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4, Radix UI, and cmdk. Tested with Vitest and Testing Library.
