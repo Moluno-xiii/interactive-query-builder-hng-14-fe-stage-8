@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Code, Home, Play } from "lucide-react";
+import { PiCode, PiHouse, PiPlay } from "react-icons/pi";
 import AppButton from "@/components/ui/app-button";
 import { Badge } from "@/components/ui/badge";
 
@@ -12,7 +12,7 @@ const NotFound = () => {
           <span className="h-2.5 w-2.5 rounded-full bg-or/70" />
           <span className="h-2.5 w-2.5 rounded-full bg-accent/70" />
           <span className="ml-2 inline-flex items-center gap-1.5 text-[11px] text-faint">
-            <Code size={12} /> query result
+            <PiCode size={12} /> query result
           </span>
           <Badge variant="destructive" className="ml-auto font-jetbrains-mono">
             404
@@ -53,7 +53,7 @@ const NotFound = () => {
           className="h-11 gap-2 px-6 text-[14px] font-semibold shadow-md"
         >
           <Link href="/" replace>
-            <Home size={16} />
+            <PiHouse size={16} />
             Back home
           </Link>
         </AppButton>
@@ -63,7 +63,7 @@ const NotFound = () => {
           className="h-11 gap-2 px-6 text-[14px] font-semibold"
         >
           <Link href="/build-query" replace>
-            <Play size={15} />
+            <PiPlay size={15} />
             Open the builder
           </Link>
         </AppButton>

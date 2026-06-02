@@ -1,8 +1,9 @@
-import { Play } from "lucide-react";
+import { PiPlay } from "react-icons/pi";
 import { FaYCombinator } from "react-icons/fa";
 import Link from "next/link";
 import PreviewCard from "@/components/landing-page/PreviewCard";
 import { Badge } from "@/components/ui/badge";
+import AppButton from "@/components/ui/app-button";
 
 const HeroSection = () => {
   return (
@@ -17,10 +18,10 @@ const HeroSection = () => {
           variant={"destructive"}
           className="mx-auto inline-flex items-center justify-center gap-1.5"
         >
-          <span className="text-[8px] font-semibold uppercase tracking-wider opacity-60">
+          <span className="text-[8px] font-semibold lowercase tracking-wider opacity-60">
             not
           </span>
-          backed by
+          <span className="uppercase">backed by</span>
           <FaYCombinator className="text-[#ff6600]" size={13} />
         </Badge>
 
@@ -35,19 +36,15 @@ const HeroSection = () => {
         </p>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-          <Link
-            href="/build-query"
-            className="inline-flex h-11 items-center gap-2 rounded-md bg-accent px-6 text-[14px] font-semibold text-accent-foreground shadow-md transition hover:bg-accent-hover"
-          >
-            <Play size={15} />
-            Launch the builder
-          </Link>
-          <a
-            href="#features"
-            className="inline-flex h-11 items-center gap-2 rounded-md border border-border bg-surface-2 px-6 text-[14px] font-semibold text-foreground transition hover:border-border-strong hover:bg-surface-3"
-          >
-            Explore features
-          </a>
+          <AppButton asChild size={"lg"}>
+            <Link href="/build-query">
+              <PiPlay size={15} />
+              Launch the builder
+            </Link>
+          </AppButton>
+          <AppButton asChild variant="secondary" size={"lg"}>
+            <a href="#features">Explore features</a>
+          </AppButton>
         </div>
         <PreviewCard />
       </div>

@@ -1,11 +1,11 @@
 "use client";
 
-import { Moon, Sun } from "lucide-react";
+import { PiMoon, PiSun } from "react-icons/pi";
 import useTheme from "@/hooks/useTheme";
 import { cn } from "@/lib/utils";
 
 const optBase =
-  "grid h-[26px] w-[30px] place-items-center rounded-[6px] text-faint transition hover:text-muted-foreground";
+  "grid h-6.5 w-7.5 place-items-center rounded-sm text-faint transition hover:text-muted-foreground";
 const optActive = "bg-surface text-accent shadow-sm";
 
 const ThemeSwitcher = () => {
@@ -24,7 +24,7 @@ const ThemeSwitcher = () => {
         aria-label="Light theme"
         aria-pressed={theme === "light"}
       >
-        <Sun size={15} />
+        <PiSun size={15} />
       </button>
       <button
         type="button"
@@ -34,7 +34,7 @@ const ThemeSwitcher = () => {
         aria-label="Dark theme"
         aria-pressed={theme === "dark"}
       >
-        <Moon size={14} />
+        <PiMoon size={14} />
       </button>
     </div>
   );
