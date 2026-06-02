@@ -9,14 +9,11 @@ import {
 } from "react-icons/pi";
 
 export interface TourStep {
-  /** CSS selector for the element to highlight, or null for a centered card. */
   target: string | null;
-  /** Selector tried when the primary target is hidden (e.g. on mobile). */
   fallback?: string;
   title: string;
   body: string;
   icon: IconType;
-  /** Extra spotlight padding around the target, in pixels. */
   pad?: number;
 }
 

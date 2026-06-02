@@ -32,20 +32,22 @@ const BuilderTour = () => {
   const { active, step, total, next, prev, close } = useTour();
   const [rect, setRect] = useState<DOMRect | null>(null);
 
-  // Measure the current target, scroll it into view, and keep the rect synced.
   useEffect(() => {
     if (!active) return;
     const s = TOUR_STEPS[step];
     const el = findTarget(s.target, s.fallback);
     if (el)
-      el.scrollIntoView({ block: "center", inline: "center", behavior: "smooth" });
+      el.scrollIntoView({
+        block: "center",
+        inline: "center",
+        behavior: "smooth",
+      });
 
     const measure = () => {
       const t = findTarget(s.target, s.fallback);
       setRect(t ? t.getBoundingClientRect() : null);
     };
     measure();
-    // Keep up with the smooth-scroll settling for a short window.
     const interval = window.setInterval(measure, 100);
     const stop = window.setTimeout(() => window.clearInterval(interval), 650);
     window.addEventListener("resize", measure);
@@ -58,7 +60,6 @@ const BuilderTour = () => {
     };
   }, [active, step]);
 
-  // Keyboard controls and scroll lock while the tour is open.
   useEffect(() => {
     if (!active) return;
     const onKey = (e: KeyboardEvent) => {
@@ -140,7 +141,7 @@ const BuilderTour = () => {
 
   return (
     <div
-      className="fixed inset-0 z-[70]"
+      className="fixed inset-0 z-70"
       role="dialog"
       aria-modal="true"
       aria-label="Product tour"

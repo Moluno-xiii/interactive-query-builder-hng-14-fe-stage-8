@@ -39,7 +39,6 @@ const TourProvider = ({ children }: { children: ReactNode }) => {
     });
   const prev = () => setStep((s) => Math.max(0, s - 1));
 
-  // Show the tour once, the first time a user lands on the builder.
   useEffect(() => {
     if (localStorageStore.get<boolean>(TOUR_SEEN_KEY)) return;
     const id = window.setTimeout(() => {
