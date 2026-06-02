@@ -1,29 +1,22 @@
-import { PiArrowDown, PiArrowUp, PiFunnel, PiWarningCircle } from "react-icons/pi";
+"use client";
+
+import {
+  PiArrowDown,
+  PiArrowUp,
+  PiFunnel,
+  PiWarningCircle,
+} from "react-icons/pi";
 import { Badge } from "@/components/ui/badge";
 import AppButton from "@/components/ui/app-button";
 import ConditionGroup from "@/components/build-query/builder/ConditionGroup";
 import DnDProvider from "@/components/build-query/builder/DnDProvider";
-import type { Action, Errors, Group } from "@/components/build-query/types";
+import useQueryActions from "@/hooks/useQueryActions";
+import useQueryState from "@/hooks/useQueryState";
 
-interface BuilderPaneProps {
-  tree: Group;
-  errors: Errors;
-  errorCount: number;
-  completeCount: number;
-  allCollapsed: boolean;
-  dispatch: (a: Action) => void;
-  onClear: () => void;
-}
-
-const BuilderPane = ({
-  tree,
-  errors,
-  errorCount,
-  completeCount,
-  allCollapsed,
-  dispatch,
-  onClear,
-}: BuilderPaneProps) => {
+const BuilderPane = () => {
+  const { tree, errors, errorCount, completeCount, allCollapsed } =
+    useQueryState();
+  const { dispatch, clearBuilder } = useQueryActions();
   return (
     <section className="flex min-w-0 flex-[1.32] flex-col bg-background max-[940px]:min-h-[56vh]">
       <header className="flex h-11.5 flex-none items-center justify-between border-b border-border-soft bg-surface pl-4 pr-3.5">
@@ -40,13 +33,15 @@ const BuilderPane = ({
             size="icon-sm"
             aria-label={allCollapsed ? "Expand all" : "Collapse all"}
             title={allCollapsed ? "Expand all" : "Collapse all"}
-            onClick={() => dispatch({ t: "collapseAll", collapsed: !allCollapsed })}
+            onClick={() =>
+              dispatch({ t: "collapseAll", collapsed: !allCollapsed })
+            }
           >
             {allCollapsed ? <PiArrowDown /> : <PiArrowUp />}
           </AppButton>
           <button
             className="rounded-sm px-2 py-1.25 text-[12.5px] font-medium text-faint transition hover:bg-danger-dim hover:text-danger"
-            onClick={onClear}
+            onClick={clearBuilder}
           >
             Clear
           </button>
@@ -64,8 +59,18 @@ const BuilderPane = ({
       )}
 
       <div className="qf-scroll flex-1 overflow-auto p-4">
-        <DnDProvider onMove={(dragId, targetId, edge) => dispatch({ t: "move", dragId, targetId, edge })}>
-          <ConditionGroup group={tree} depth={0} isRoot errors={errors} dispatch={dispatch} />
+        <DnDProvider
+          onMove={(dragId, targetId, edge) =>
+            dispatch({ t: "move", dragId, targetId, edge })
+          }
+        >
+          <ConditionGroup
+            group={tree}
+            depth={0}
+            isRoot
+            errors={errors}
+            dispatch={dispatch}
+          />
         </DnDProvider>
         <div className="mt-4 border-t border-dashed border-border px-3 py-2.5 text-center font-jetbrains-mono text-[11px] text-faint">
           <kbd className="rounded border border-border bg-surface-2 px-1.25 py-px font-jetbrains-mono text-muted-foreground">

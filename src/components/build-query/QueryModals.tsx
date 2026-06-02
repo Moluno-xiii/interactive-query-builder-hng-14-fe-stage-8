@@ -1,61 +1,49 @@
+"use client";
+
 import SchemaModal from "@/components/build-query/panels/SchemaModal";
 import IOModal from "@/components/build-query/panels/IOModal";
 import PresetsModal from "@/components/build-query/panels/PresetsModal";
 import HistoryModal from "@/components/build-query/panels/HistoryModal";
-import type { Group, HistoryEntry, Preset } from "@/components/build-query/types";
-import { ModalKind } from ".";
+import useQueryActions from "@/hooks/useQueryActions";
+import useQueryState from "@/hooks/useQueryState";
 
-interface QueryModalsProps {
-  modal: ModalKind | null;
-  tree: Group;
-  presets: Preset[];
-  history: HistoryEntry[];
-  onClose: () => void;
-  onImport: (t: Group) => void;
-  onSavePreset: (name: string) => void;
-  onLoadTree: (t: Group) => void;
-  onDeletePreset: (ts: number) => void;
-  onDeleteHistory: (ts: number) => void;
-  onClearHistory: () => void;
-}
+const QueryModals = () => {
+  const { modal, tree, presets, history } = useQueryState();
+  const {
+    setModal,
+    importTree,
+    savePreset,
+    loadTree,
+    deletePreset,
+    deleteHistory,
+    clearHistory,
+  } = useQueryActions();
 
-const QueryModals = ({
-  modal,
-  tree,
-  presets,
-  history,
-  onClose,
-  onImport,
-  onSavePreset,
-  onLoadTree,
-  onDeletePreset,
-  onDeleteHistory,
-  onClearHistory,
-}: QueryModalsProps) => {
   if (!modal) return null;
+  const onClose = () => setModal(null);
 
   return (
     <>
       {modal === "schema" && <SchemaModal onClose={onClose} />}
       {modal === "io" && (
-        <IOModal tree={tree} onImport={onImport} onClose={onClose} />
+        <IOModal tree={tree} onImport={importTree} onClose={onClose} />
       )}
       {modal === "presets" && (
         <PresetsModal
           presets={presets}
           current={tree}
-          onSave={onSavePreset}
-          onLoad={onLoadTree}
-          onDelete={onDeletePreset}
+          onSave={savePreset}
+          onLoad={loadTree}
+          onDelete={deletePreset}
           onClose={onClose}
         />
       )}
       {modal === "history" && (
         <HistoryModal
           history={history}
-          onLoad={onLoadTree}
-          onDelete={onDeleteHistory}
-          onClear={onClearHistory}
+          onLoad={loadTree}
+          onDelete={deleteHistory}
+          onClear={clearHistory}
           onClose={onClose}
         />
       )}
