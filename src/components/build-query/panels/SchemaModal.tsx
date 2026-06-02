@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import BrandMark from "@/components/build-query/ui/BrandMark";
 import FieldIcon from "@/components/build-query/ui/FieldIcon";
-import { ENUMS, SCHEMA } from "@/components/build-query/data";
+import { DATASET, ENUMS, SCHEMA } from "@/components/build-query/data";
 
 const SchemaModal = ({ onClose }: { onClose: () => void }) => {
   return (
@@ -60,7 +60,8 @@ const SchemaModal = ({ onClose }: { onClose: () => void }) => {
                   {SCHEMA.name}
                 </div>
                 <div className="mt-px text-[12px] text-faint">
-                  {SCHEMA.fields.length} fields · {SCHEMA.rows} rows · postgres
+                  {SCHEMA.fields.length} fields · {DATASET.length.toLocaleString()} rows ·
+                  postgres
                 </div>
               </div>
               <Badge className="ml-auto h-4.75 gap-1 rounded-sm border-transparent bg-accent-dim px-1.75 text-[11px] font-semibold leading-none tracking-[0.2px] text-accent">

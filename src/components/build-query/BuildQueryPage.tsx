@@ -193,6 +193,10 @@ const BuildQueryPage = () => {
           setTree(c);
         }}
         onDeletePreset={(ts) => setPresets((p) => p.filter((x) => x.ts !== ts))}
+        onDeleteHistory={(ts) =>
+          setHistory((h) => h.filter((x) => x.ts !== ts))
+        }
+        onClearHistory={() => setHistory([])}
       />
     </div>
   );

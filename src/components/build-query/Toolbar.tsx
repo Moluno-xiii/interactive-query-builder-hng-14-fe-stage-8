@@ -7,7 +7,7 @@ import {
 } from "react-icons/pi";
 import AppButton from "../ui/app-button";
 import AppIcon from "../ui/AppIcon";
-import { SCHEMA } from "@/components/build-query/data";
+import { DATASET, SCHEMA } from "@/components/build-query/data";
 import ThemeSwitcher from "../ThemeSwitcher";
 import { FaPlay } from "react-icons/fa6";
 import { ModalKind } from ".";
@@ -32,7 +32,7 @@ const Toolbar = ({
         >
           <PiDatabase size={13} className="text-accent" />
           <span className="font-jetbrains-mono">{SCHEMA.name}</span>
-          {SCHEMA.rows}
+          {DATASET.length.toLocaleString()}
           <PiArrowDownRightLight size={12} className="text-faint" />
         </button>
       </div>

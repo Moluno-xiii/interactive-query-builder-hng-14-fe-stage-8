@@ -26,7 +26,7 @@ const RESULT_COLS = [
   "region",
   "created_at",
 ];
-const PAGE_SIZE = 8;
+const PAGE_SIZE = 15;
 
 const STATUS_TONE: Record<string, { pill: string; dot: string }> = {
   paid: { pill: "bg-accent-dim text-accent", dot: "bg-accent" },
