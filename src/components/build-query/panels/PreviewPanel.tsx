@@ -9,6 +9,9 @@ import queryEngine from "@/components/build-query/query-engine";
 import useQueryState from "@/hooks/useQueryState";
 import { panelHead, panelTitle } from "..";
 import highlightSql from "./highlightSql";
+import highlightJson from "./highlightJson";
+
+type PreviewFormat = "sql" | "mongo";
 
 interface PreviewPanelProps {
   tree: Group;
@@ -17,14 +20,22 @@ interface PreviewPanelProps {
 
 const PreviewPanel = ({ tree, errorCount }: PreviewPanelProps) => {
   const { schema } = useQueryState();
-  const { where } = queryEngine.sql.fullSQL(tree, schema);
+  const [format, setFormat] = useState<PreviewFormat>("sql");
   const [copied, setCopied] = useState(false);
+
+  const { where } = queryEngine.sql.fullSQL(tree, schema);
+  const mongo = queryEngine.mongo.mongoString(tree, schema);
+  const mongoLines = mongo.split("\n");
+  const lineCount = format === "sql" ? where.length + 2 : mongoLines.length;
+
   const copy = () => {
-    if (navigator.clipboard)
-      navigator.clipboard.writeText(queryEngine.sql.sqlString(tree, schema));
+    const text =
+      format === "sql" ? queryEngine.sql.sqlString(tree, schema) : mongo;
+    if (navigator.clipboard) navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 1400);
   };
+
   return (
     <section
       data-tour="preview"
@@ -34,9 +45,28 @@ const PreviewPanel = ({ tree, errorCount }: PreviewPanelProps) => {
         <div className={panelTitle}>
           <PiCode size={15} className="text-accent" />
           <span>Query preview</span>
-          <Badge className="h-4.75 gap-1 rounded-sm border-border-soft bg-surface-2 px-1.75 text-[11px] font-jetbrains-mono font-medium leading-none tracking-[0.2px] text-faint">
-            SQL
-          </Badge>
+          <div
+            className="inline-flex rounded-sm border border-border-soft bg-surface-2 p-0.5"
+            role="group"
+            aria-label="Preview format"
+          >
+            {(["sql", "mongo"] as const).map((f) => (
+              <button
+                key={f}
+                type="button"
+                onClick={() => setFormat(f)}
+                aria-pressed={format === f}
+                className={cn(
+                  "rounded-[4px] px-2 py-0.5 font-jetbrains-mono text-[10.5px] font-semibold uppercase tracking-[0.4px] transition",
+                  format === f
+                    ? "bg-surface text-accent shadow-sm"
+                    : "text-faint hover:text-muted-foreground",
+                )}
+              >
+                {f}
+              </button>
+            ))}
+          </div>
         </div>
         <div className="flex items-center gap-2">
           {errorCount > 0 && (
@@ -62,52 +92,67 @@ const PreviewPanel = ({ tree, errorCount }: PreviewPanelProps) => {
           className="flex-none select-none border-r border-border-soft py-3.5 text-right font-jetbrains-mono text-[12px] leading-[1.75] text-faint opacity-50"
           aria-hidden
         >
-          {Array.from({ length: where.length + 2 }).map((_, i) => (
+          {Array.from({ length: lineCount }).map((_, i) => (
             <div key={i} className="px-3">
               {i + 1}
             </div>
           ))}
         </div>
         <pre className="flex-1 overflow-x-auto px-4 py-3.5 font-jetbrains-mono text-[12.5px] leading-[1.75]">
-          <div className="whitespace-pre">
-            <span className="font-semibold text-and">SELECT</span>{" "}
-            <span className="text-muted-foreground">*</span>{" "}
-            <span className="font-semibold text-and">FROM</span>{" "}
-            <span className="font-semibold text-accent">{schema.name}</span>
-          </div>
-          <div className="whitespace-pre">
-            <span className="font-semibold text-and">WHERE</span>
-          </div>
-          {where.map((ln, idx) => (
-            <div
-              className="whitespace-pre"
-              key={idx}
-              style={{ paddingLeft: 14 + ln.pad.length * 9 }}
-            >
-              {ln.kind === "comment" ? (
-                <span className="italic text-faint">{ln.text}</span>
-              ) : (
-                <>
-                  {highlightSql(ln.text)}
-                  {ln.conj && (
-                    <span
-                      className={cn(
-                        "font-bold",
-                        ln.conj === "AND" ? "text-and" : "text-or",
+          {format === "sql" ? (
+            <>
+              <div className="whitespace-pre">
+                <span className="font-semibold text-and">SELECT</span>{" "}
+                <span className="text-muted-foreground">*</span>{" "}
+                <span className="font-semibold text-and">FROM</span>{" "}
+                <span className="font-semibold text-accent">{schema.name}</span>
+              </div>
+              <div className="whitespace-pre">
+                <span className="font-semibold text-and">WHERE</span>
+              </div>
+              {where.map((ln, idx) => (
+                <div
+                  className="whitespace-pre"
+                  key={idx}
+                  style={{ paddingLeft: 14 + ln.pad.length * 9 }}
+                >
+                  {ln.kind === "comment" ? (
+                    <span className="italic text-faint">{ln.text}</span>
+                  ) : (
+                    <>
+                      {highlightSql(ln.text)}
+                      {ln.conj && (
+                        <span
+                          className={cn(
+                            "font-bold",
+                            ln.conj === "AND" ? "text-and" : "text-or",
+                          )}
+                        >
+                          {" "}
+                          {ln.conj}
+                        </span>
                       )}
-                    >
-                      {" "}
-                      {ln.conj}
-                    </span>
+                    </>
                   )}
-                </>
-              )}
-            </div>
-          ))}
-          <div className="whitespace-pre">
-            <span className="text-muted-foreground">;</span>
-            <span className="ml-0.75 inline-block h-3.75 w-1.75 bg-accent align-text-bottom opacity-80 animate-blink" />
-          </div>
+                </div>
+              ))}
+              <div className="whitespace-pre">
+                <span className="text-muted-foreground">;</span>
+                <span className="ml-0.75 inline-block h-3.75 w-1.75 bg-accent align-text-bottom opacity-80 animate-blink" />
+              </div>
+            </>
+          ) : (
+            <>
+              {mongoLines.map((ln, idx) => (
+                <div className="whitespace-pre" key={idx}>
+                  {highlightJson(ln)}
+                </div>
+              ))}
+              <div className="whitespace-pre">
+                <span className="inline-block h-3.75 w-1.75 bg-accent align-text-bottom opacity-80 animate-blink" />
+              </div>
+            </>
+          )}
         </pre>
       </div>
     </section>

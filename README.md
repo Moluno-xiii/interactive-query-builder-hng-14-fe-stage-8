@@ -1,6 +1,6 @@
 # Interactive Query Builder
 
-A visual query builder built with Next.js. Compose complex, nested database queries through a graphical interface instead of writing raw syntax, preview the generated SQL live, and run simulated queries against sample datasets.
+A visual query builder built with Next.js. Compose complex, nested database queries through a graphical interface instead of writing raw syntax, preview the generated query live, and run simulated queries against sample datasets.
 
 ## Features
 
@@ -29,7 +29,7 @@ A visual query builder built with Next.js. Compose complex, nested database quer
 
 **Preview and results**
 
-- Live SQL preview with syntax highlighting and one-click copy.
+- Live query preview in SQL or MongoDB-style JSON, with syntax highlighting and one-click copy.
 - Simulated execution with a sortable, paginated results table and row count.
 
 **Save, history, and sharing**
@@ -109,10 +109,11 @@ The cost is that `locate` is an O(n) recursive walk rather than an O(1) map look
 
 ### Query engine
 
-`query-engine.ts` is a small composition root: one `QueryEngine` instance wires six single-responsibility services together with constructor injection, exported as a singleton.
+`query-engine.ts` is a small composition root: one `QueryEngine` instance wires seven single-responsibility services together with constructor injection, exported as a singleton.
 
 - `TreeService`: immutable tree operations (add, remove, duplicate, move, collapse, patch), recursive locate and walk, id minting, and a drag-and-drop move with an ancestor guard that refuses to drop a group into its own descendant.
 - `SqlService`: turns a tree into both a flat SQL string and structured, highlightable lines; string values are quote-escaped to keep generated SQL safe.
+- `MongoService`: turns the same tree into a MongoDB-style query object, the alternate preview format.
 - `EvaluationService`: compiles a tree into a predicate and filters the dataset (the simulated execution).
 - `ValidationService`: semantic validation (operator/field compatibility, range and date order, regex compile, empty groups) producing a node-keyed error map.
 - `FormatService`: cell and value formatting for the results grid.
@@ -131,7 +132,7 @@ Each service is a plain class with no React or DOM dependency, which is why they
 ### Trade-offs
 
 - Custom drag-and-drop over a library: native HTML5 DnD with a custom drop-line keeps dependencies down and gives full control over the nesting UX, at the cost of more manual edge handling.
-- SQL-only preview: the spec allows SQL or Mongo or GraphQL, so the preview targets one format well rather than three partially.
+- SQL and MongoDB-style preview, not GraphQL: the spec accepts any one format, so the preview offers the two most readable for this data.
 - Context plus a reducer-style service instead of Redux or Zustand: no extra state library for a single-feature surface, and the React Compiler covers memoization.
 - Seeded in-memory data: execution runs against deterministically generated rows (a seeded PRNG) instead of a backend, so the app stays front-end-only and reproducible across reloads.
 - Zod only at the edges: structural validation guards imports and storage, while semantic validation stays in `ValidationService`, keeping the two concerns separate.
