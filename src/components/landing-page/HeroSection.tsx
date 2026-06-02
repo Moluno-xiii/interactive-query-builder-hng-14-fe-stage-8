@@ -2,16 +2,14 @@ import { PiPlay } from "react-icons/pi";
 import { FaYCombinator } from "react-icons/fa";
 import Link from "next/link";
 import PreviewCard from "@/components/landing-page/PreviewCard";
+import HeroGrid from "@/components/landing-page/HeroGrid";
 import { Badge } from "@/components/ui/badge";
 import AppButton from "@/components/ui/app-button";
 
 const HeroSection = () => {
   return (
     <section className="relative overflow-hidden">
-      <div
-        className="qf-hero-grid pointer-events-none absolute inset-0 opacity-60"
-        aria-hidden
-      />
+      <HeroGrid />
 
       <div className="relative mx-auto max-w-6xl px-5 pb-16 pt-20 text-center sm:pt-28">
         <Badge
