@@ -2,12 +2,11 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
-import { X } from "lucide-react";
 import AppIcon from "@/components/ui/AppIcon";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
 import AppButton from "@/components/ui/app-button";
 import { cn } from "@/lib/utils";
-import { PiArrowBendUpRightFill } from "react-icons/pi";
+import { PiArrowBendUpRightFill, PiX } from "react-icons/pi";
 import { NAV_LINKS } from "@/constants";
 
 interface MobileNavProps {
@@ -56,7 +55,7 @@ const MobileNav = ({ open, onClose }: MobileNavProps) => {
             aria-label="Close menu"
             className="grid size-8 place-items-center rounded-md text-faint transition hover:bg-surface-2 hover:text-foreground"
           >
-            <X size={18} />
+            <PiX size={18} />
           </button>
         </div>
 

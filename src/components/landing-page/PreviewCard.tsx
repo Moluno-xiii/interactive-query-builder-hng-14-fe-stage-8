@@ -1,4 +1,4 @@
-import { Code } from "lucide-react";
+import { PiCode } from "react-icons/pi";
 import { Badge } from "@/components/ui/badge";
 
 const PreviewCard = () => {
@@ -10,7 +10,7 @@ const PreviewCard = () => {
           <span className="h-2.5 w-2.5 rounded-full bg-or/70" />
           <span className="h-2.5 w-2.5 rounded-full bg-accent/70" />
           <span className="ml-2 inline-flex items-center gap-1.5 text-[11px] text-faint">
-            <Code size={15} /> generated query
+            <PiCode size={15} /> generated query
           </span>
           <Badge
             variant={"outline"}

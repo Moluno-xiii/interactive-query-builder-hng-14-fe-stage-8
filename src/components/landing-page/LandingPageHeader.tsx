@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Menu } from "lucide-react";
-import { PiArrowBendUpRightFill } from "react-icons/pi";
+import { PiArrowBendUpRightFill, PiList } from "react-icons/pi";
 import AppIcon from "@/components/ui/AppIcon";
 import AppButton from "@/components/ui/app-button";
 import ThemeSwitcher from "@/components/ThemeSwitcher";
@@ -50,7 +49,7 @@ const LandingPageHeader = () => {
             aria-expanded={menuOpen}
             className="ml-auto grid size-9 place-items-center rounded-md border border-border bg-surface-2 text-foreground transition hover:border-border-strong hover:bg-surface-3 sm:hidden"
           >
-            <Menu size={18} />
+            <PiList size={18} />
           </button>
         </nav>
       </header>

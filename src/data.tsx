@@ -1,41 +1,41 @@
 import { ReactNode } from "react";
 import {
-  Layers,
-  Database,
-  Code,
-  TableProperties,
-  AlertCircle,
-  Command,
-} from "lucide-react";
+  PiStack,
+  PiDatabase,
+  PiCode,
+  PiTable,
+  PiWarningCircle,
+  PiCommand,
+} from "react-icons/pi";
 
 const FEATURES: { icon: ReactNode; title: string; desc: string }[] = [
   {
-    icon: <Layers size={20} />,
+    icon: <PiStack size={20} />,
     title: "Unlimited nested logic",
     desc: "Group conditions and nest groups within groups — each with its own AND / OR. Build (A AND B) OR (C AND D) without writing a line of SQL.",
   },
   {
-    icon: <Database size={20} />,
+    icon: <PiDatabase size={20} />,
     title: "Schema-driven controls",
     desc: "The builder reads the field schema and renders the right input every time — number fields, date pickers, enum dropdowns, multi-select.",
   },
   {
-    icon: <Code size={20} />,
+    icon: <PiCode size={20} />,
     title: "Live query preview",
     desc: "A syntax-highlighted SQL preview regenerates on every keystroke, so the query you’re building is always in front of you.",
   },
   {
-    icon: <TableProperties size={20} />,
+    icon: <PiTable size={20} />,
     title: "Execution simulator",
     desc: "Run the query against a seeded dataset of orders. Sortable, paginated results with loading, empty, and ready states.",
   },
   {
-    icon: <AlertCircle size={20} />,
+    icon: <PiWarningCircle size={20} />,
     title: "Validation engine",
     desc: "Incompatible operators, empty groups, and invalid ranges are caught and surfaced inline before the query ever runs.",
   },
   {
-    icon: <Command size={20} />,
+    icon: <PiCommand size={20} />,
     title: "Built for real work",
     desc: "Drag-and-drop reordering, collapsible groups, query history, saved presets, JSON import/export, and a light/dark toggle.",
   },
