@@ -18,6 +18,7 @@ import type { ModalKind } from "@/components/build-query";
 import { SCHEMAS, schemaById } from "@/components/build-query/data";
 import queryEngine from "@/components/build-query/query-engine";
 import localStorageStore from "@/lib/local-storage";
+import { storageKeys } from "@/lib/storage-keys";
 import {
   parseTree,
   parsePresets,
@@ -45,21 +46,21 @@ const QueryBuilderProvider = ({ children }: { children: ReactNode }) => {
   );
 
   const [activeSchemaId, setActiveSchemaId] = useState<string>(
-    () => schemaById(localStorageStore.get<string>("qf_schema")).id,
+    () => schemaById(localStorageStore.get<string>(storageKeys.query.schema)).id,
   );
   const [tree, setTree] = useState<Group>(
     () =>
-      parseTree(localStorageStore.get("qf_tree")) ??
+      parseTree(localStorageStore.get(storageKeys.query.tree)) ??
       queryEngine.tree.starterTree(
-        schemaById(localStorageStore.get<string>("qf_schema")),
+        schemaById(localStorageStore.get<string>(storageKeys.query.schema)),
       ),
   );
   const [modal, setModal] = useState<ModalKind | null>(null);
   const [presets, setPresets] = useState<Preset[]>(() =>
-    parsePresets(localStorageStore.get("qf_presets")),
+    parsePresets(localStorageStore.get(storageKeys.query.presets)),
   );
   const [history, setHistory] = useState<HistoryEntry[]>(() =>
-    parseHistory(localStorageStore.get("qf_history")),
+    parseHistory(localStorageStore.get(storageKeys.query.history)),
   );
   const [runState, setRunState] = useState<RunState>("idle");
   const [results, setResults] = useState<Row[]>([]);
@@ -78,16 +79,16 @@ const QueryBuilderProvider = ({ children }: { children: ReactNode }) => {
   }, [schema]);
 
   useEffect(() => {
-    if (mounted) localStorageStore.set("qf_schema", activeSchemaId);
+    if (mounted) localStorageStore.set(storageKeys.query.schema, activeSchemaId);
   }, [activeSchemaId, mounted]);
   useEffect(() => {
-    if (mounted) localStorageStore.set("qf_tree", tree);
+    if (mounted) localStorageStore.set(storageKeys.query.tree, tree);
   }, [tree, mounted]);
   useEffect(() => {
-    if (mounted) localStorageStore.set("qf_presets", presets);
+    if (mounted) localStorageStore.set(storageKeys.query.presets, presets);
   }, [presets, mounted]);
   useEffect(() => {
-    if (mounted) localStorageStore.set("qf_history", history);
+    if (mounted) localStorageStore.set(storageKeys.query.history, history);
   }, [history, mounted]);
 
   const dispatch = (a: Parameters<typeof queryEngine.tree.applyAction>[1]) =>

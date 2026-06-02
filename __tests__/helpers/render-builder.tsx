@@ -4,6 +4,7 @@ import BuilderPane from "@/components/build-query/BuilderPane";
 import PreviewPanel from "@/components/build-query/panels/PreviewPanel";
 import useQueryState from "@/hooks/useQueryState";
 import type { Group, Rule } from "@/components/build-query/types";
+import { storageKeys } from "@/lib/storage-keys";
 
 export const mkRule = (id: string, over: Partial<Rule> = {}): Rule => ({
   id,
@@ -22,8 +23,8 @@ export const mkGroup = (
 ): Group => ({ id, kind: "group", combinator, collapsed: false, children });
 
 export const seed = (tree: Group, schemaId = "orders") => {
-  localStorage.setItem("qf_schema", JSON.stringify(schemaId));
-  localStorage.setItem("qf_tree", JSON.stringify(tree));
+  localStorage.setItem(storageKeys.query.schema, JSON.stringify(schemaId));
+  localStorage.setItem(storageKeys.query.tree, JSON.stringify(tree));
 };
 
 export const renderBuilder = () =>
