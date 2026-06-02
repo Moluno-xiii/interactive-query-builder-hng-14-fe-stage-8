@@ -33,6 +33,7 @@ const GroupHeader = ({
 
   return (
     <div
+      data-tour={isRoot ? "logic" : undefined}
       className={cn(
         "flex flex-wrap items-center gap-1.75 py-2.25 pr-2.5",
         isRoot ? "pl-2.75" : "pl-3.25",

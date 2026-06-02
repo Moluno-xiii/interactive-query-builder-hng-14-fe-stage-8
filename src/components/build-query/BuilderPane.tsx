@@ -19,7 +19,10 @@ const BuilderPane = () => {
   const { dispatch, clearBuilder } = useQueryActions();
   return (
     <section className="flex min-w-0 flex-[1.32] flex-col bg-background max-[940px]:min-h-[56vh]">
-      <header className="flex h-11.5 flex-none items-center justify-between border-b border-border-soft bg-surface pl-4 pr-3.5">
+      <header
+        data-tour="builder"
+        className="flex h-11.5 flex-none items-center justify-between border-b border-border-soft bg-surface pl-4 pr-3.5"
+      >
         <div className="flex items-center gap-2.25 text-[13.5px] font-semibold tracking-[0.2px]">
           <PiFunnel size={15} className="text-accent" />
           <span>Query builder</span>
