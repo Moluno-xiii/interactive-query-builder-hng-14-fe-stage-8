@@ -26,7 +26,10 @@ const PreviewPanel = ({ tree, errorCount }: PreviewPanelProps) => {
     setTimeout(() => setCopied(false), 1400);
   };
   return (
-    <section className="flex max-h-[42%] flex-none flex-col bg-background">
+    <section
+      data-tour="preview"
+      className="flex max-h-[42%] flex-none flex-col bg-background"
+    >
       <header className={panelHead}>
         <div className={panelTitle}>
           <PiCode size={15} className="text-accent" />

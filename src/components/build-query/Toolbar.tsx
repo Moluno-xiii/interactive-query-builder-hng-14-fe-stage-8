@@ -8,6 +8,7 @@ import {
   PiCodeLight,
   PiDatabase,
   PiList,
+  PiQuestion,
 } from "react-icons/pi";
 import { FaPlay } from "react-icons/fa6";
 import AppButton from "../ui/app-button";
@@ -16,11 +17,13 @@ import ThemeSwitcher from "../ThemeSwitcher";
 import BuilderMobileNav from "@/components/build-query/BuilderMobileNav";
 import useQueryActions from "@/hooks/useQueryActions";
 import useQueryState from "@/hooks/useQueryState";
+import useTour from "@/hooks/useTour";
 
 const Toolbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const { run, setModal } = useQueryActions();
   const { runState, schema } = useQueryState();
+  const { start: startTour } = useTour();
   const running = runState === "loading";
   return (
     <>
@@ -30,6 +33,7 @@ const Toolbar = () => {
           <div className="hidden min-w-0 items-center gap-2.25 sm:flex">
             <span className="mx-px text-[17px] font-light text-faint">/</span>
             <button
+              data-tour="source"
               className="flex min-w-0 items-center gap-1.75 rounded-md border border-border bg-surface-2 py-1.25 pl-2.5 pr-2.25 text-[13px] text-foreground transition hover:border-border-strong hover:bg-surface-3"
               onClick={() => setModal("schema")}
               title="Switch data source"
@@ -73,11 +77,25 @@ const Toolbar = () => {
             <PiCodeLight size={18} />
           </AppButton>
         </div>
+        <AppButton
+          variant={"ghost"}
+          size={"icon"}
+          aria-label="How to use this app"
+          title="Take a tour"
+          onClick={startTour}
+        >
+          <PiQuestion size={18} />
+        </AppButton>
         <div className="mx-1.25 hidden h-5.5 w-px bg-border sm:block" />
         <div className="hidden sm:block">
           <ThemeSwitcher />
         </div>
-        <AppButton className="ml-1" onClick={run} disabled={running}>
+        <AppButton
+          data-tour="run"
+          className="ml-1"
+          onClick={run}
+          disabled={running}
+        >
           <FaPlay />
           {running ? "Running…" : "Run"}
           <kbd className="ml-0.5 hidden rounded-[5px] bg-black/20 px-1.25 py-px font-jetbrains-mono text-[10.5px] leading-[1.4] text-accent-foreground opacity-80 sm:inline-block">
@@ -87,6 +105,7 @@ const Toolbar = () => {
 
         <button
           type="button"
+          data-tour="menu"
           onClick={() => setMenuOpen(true)}
           aria-label="Open menu"
           aria-expanded={menuOpen}
